@@ -17,11 +17,8 @@ function createDefaultRDSManager() {
             rejectUnauthorized: false,
           },
         };
-
     const pool = new Pool(poolConfig);
-
     const dialect = new PostgresDialect({ pool });
-
     return new Kysely<Database>({ dialect });
   } catch (error) {
     if (isDevelopment) {
@@ -29,7 +26,7 @@ function createDefaultRDSManager() {
     } else {
       logger.error('Failed to connect to RDS', error);
     }
-    throw new Error(`Failed to connect to RDS: ${error}`);
+    return null;
   }
 }
 
@@ -42,7 +39,7 @@ function createVercelRDSManager() {
     } else {
       logger.error('Failed to connect to Vercel Postgres', error);
     }
-    throw new Error(`Failed to connect to Vercel Postgres: ${error}`);
+    return null;
   }
 }
 
