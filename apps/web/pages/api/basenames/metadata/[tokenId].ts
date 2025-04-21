@@ -41,6 +41,15 @@ export default async function GET(request: Request) {
     encodePacked(['bytes32', 'bytes32'], [namehash(baseDomainName), labelhash]),
   );
 
+  logger.info(
+    `Getting basename metadata, step 1:
+    tokenId: ${tokenId}.
+    chainId: ${chainId}.
+    namehashNode: ${namehashNode}.
+    labelhash: ${labelhash}.
+    baseDomainName: ${baseDomainName}.`,
+  );
+
   let basenameFormatted = undefined;
   let nameExpires = undefined;
   try {
@@ -56,12 +65,22 @@ export default async function GET(request: Request) {
     logger.error('Error getting token metadata', error);
   }
 
+  logger.info(
+    `Basename metadata, step 2:
+    basenameFormatted: ${basenameFormatted}.
+    nameExpires: ${nameExpires}.`,
+  );
+
   // Premints are hardcoded; the list will reduce when/if they are claimed
   if (!basenameFormatted && premintMapping[tokenId]) {
     basenameFormatted = formatBaseEthDomain(premintMapping[tokenId], chainId);
   }
 
   if (!basenameFormatted) {
+    logger.error(
+      `Basename not found for tokenId: ${tokenId} on chainId: ${chainId}`,
+      'unknown error',
+    );
     return NextResponse.json({ error: '404: Basename not found' }, { status: 404 });
   }
 
