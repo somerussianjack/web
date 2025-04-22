@@ -13,6 +13,7 @@ import {
 import { NextResponse } from 'next/server';
 import { encodePacked, keccak256, namehash, toHex } from 'viem';
 import { base } from 'viem/chains';
+import logEvent from 'libs/base-ui/utils/logEvent';
 
 export const config = {
   runtime: 'edge',
@@ -62,6 +63,9 @@ export default async function GET(request: Request) {
     });
     nameExpires = await getBasenameNameExpires(basenameFormatted as Basename);
   } catch (error) {
+    logEvent('basename_profile_frame_farcaster_sign_in_rendered', {
+      error
+    });
     logger.error('Error getting token metadata', error);
   }
 

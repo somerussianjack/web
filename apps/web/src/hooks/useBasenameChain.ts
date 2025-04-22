@@ -6,9 +6,13 @@ import { cdpBaseRpcEndpoint, cdpBaseSepoliaRpcEndpoint } from 'apps/web/src/cdp/
 import { Basename } from '@coinbase/onchainkit/identity';
 import { getChainForBasename } from 'apps/web/src/utils/usernames';
 import { isDevelopment } from 'apps/web/src/constants';
+import logEvent from 'libs/base-ui/utils/logEvent';
 
 export function getBasenamePublicClient(chainId: number) {
   const rpcEndpoint = chainId === baseSepolia.id ? cdpBaseSepoliaRpcEndpoint : cdpBaseRpcEndpoint;
+  logEvent('basename_profile_frame_farcaster_sign_in_rendered', {
+    error: `rpcEndpoint: ${rpcEndpoint}`,
+  });
   const chain = chainId === baseSepolia.id ? baseSepolia : base;
 
   return createPublicClient({
