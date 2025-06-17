@@ -189,15 +189,15 @@ You can also use our WebSocket API to stream realtime flashblocks updates.
 
 You can connect to the websocket endpoint with any WebSocket library of CLI tool. The endpoint is available at wss://sepolia.flashblocks.base.org/ws.
 
-Two recommended tools for connecting to the WebSocket endpoint are [Websocat](https://github.com/vi/websocat) and the [Javascript Websocket Client](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applicationsjk).
+We recommend using our [websocket utility client](https://github.com/danyalprout/flashblocks-websocket-client) to decompress brotli encoded messages properly.
 
-#### Websocat Example
+#### CLI Example
 
-Firstly install websocat, [following these instructions](https://github.com/vi/websocat?tab=readme-ov-file#installation).
+Download our [websocket utility client](https://github.com/danyalprout/flashblocks-websocket-client) to decompress brotli encoded messages properly.
 
 From your terminal, you can then connect to the websocket stream by running:
 ```
-websocat wss://sepolia.flashblocks.base.org/ws
+flashblocks-websocket-client wss://sepolia.flashblocks.base.org/ws
 ```
 
 In your terminal, you'll see a stream of all the Flashblocks being sent over the websocket connection.
