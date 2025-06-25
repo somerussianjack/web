@@ -14,7 +14,6 @@ type ThemeContextProps = {
   toggleTheme: () => void;
 };
 
-// test
 export const ThemeContext = createContext<ThemeContextProps>({
   theme: 'dark',
   toggleTheme: () => {},
