@@ -89,6 +89,7 @@ export function LiveDemo({
     switch (activeTab) {
       case 'SmartWallet':
         return (
+          // TODO: upgrade to onchainkit v1 and remove this hacky solution
           <>
             <style>{`
               .ock-text-foreground {
