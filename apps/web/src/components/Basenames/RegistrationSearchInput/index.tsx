@@ -317,7 +317,7 @@ export default function RegistrationSearchInput({
           </p>
         ) : (
           <>
-            <Link href={`name/${formattedBaseEthDomain}`} className={buttonClasses}>
+            <Link href={`name/${encodeURIComponent(formattedBaseEthDomain)}`} className={buttonClasses}>
               <div className={registeredContentClasses}>
                 <span className="truncate">{formattedBaseEthDomain}</span>
                 <span className={mutedStatus}>Registered</span>

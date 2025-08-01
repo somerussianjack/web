@@ -567,7 +567,12 @@ export async function getBasenameAddress(username: Basename) {
       universalResolverAddress: USERNAME_L2_RESOLVER_ADDRESSES[chain.id],
     });
     return ensAddress;
-  } catch (error) {}
+  } catch (error) {
+    logger.error('Error fetching basename address', {
+      error,
+      username,
+    });
+  }
 }
 
 /*
@@ -591,7 +596,12 @@ export async function getBasenameEditor(username: Basename) {
     const owner = await client.readContract(buildBasenameEditorContract(username));
 
     return owner;
-  } catch (error) {}
+  } catch (error) {
+    logger.error('Error fetching basename editor', {
+      error,
+      username,
+    });
+  }
 }
 
 /*
@@ -617,7 +627,12 @@ export async function getBasenameOwner(username: Basename) {
     const owner = await client.readContract(buildBasenameOwnerContract(username));
 
     return owner;
-  } catch (error) {}
+  } catch (error) {
+    logger.error('Error fetching basename owner', {
+      error,
+      username,
+    });
+  }
 }
 
 export async function getBasenameNameExpires(username: Basename) {

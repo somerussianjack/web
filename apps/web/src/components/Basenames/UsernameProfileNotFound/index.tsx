@@ -41,7 +41,7 @@ export default function UsernameProfileNotFound() {
   const description = username
     ? "There's no profile associated with this name, but it could be yours!"
     : "This profile doesn't exist";
-  const linkHref = username ? `/names?claim=${username}` : `/names`;
+  const linkHref = username ? `/names?claim=${encodeURIComponent(username)}` : `/names`;
   return (
     <div className="flex w-full flex-col items-center gap-8 text-center">
       <ImageWithLoading
