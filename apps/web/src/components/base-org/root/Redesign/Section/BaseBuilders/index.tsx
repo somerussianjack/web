@@ -3,7 +3,7 @@
 import { ImageType, Section } from 'apps/web/src/components/base-org/root/Redesign/Section';
 import PrefixAsset from './prefix.svg';
 import { Terminal } from './Terminal';
-import FaultyTerminal from './FaultyTerminal';
+// import FaultyTerminal from './FaultyTerminal';
 
 const prefix = PrefixAsset as ImageType;
 
@@ -14,8 +14,8 @@ export function SectionBaseBuilders() {
         <div className="z-[9999]">
           <Terminal />
         </div>
-        <div className="absolute inset-0 w-full h-full">
-          <FaultyTerminal
+        <div className="absolute inset-0 h-full w-full">
+          {/* <FaultyTerminal
             className="w-full h-full"
             scale={3}
             noiseAmp={1}
@@ -23,7 +23,7 @@ export function SectionBaseBuilders() {
             brightness={1.2}
             scanlineIntensity={0.0}
             tint="#8F8FFF"
-          />
+          /> */}
         </div>
       </div>
     </Section>
