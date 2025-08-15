@@ -105,18 +105,7 @@ export function Section({ content, children, className, disableWrapperAnimation 
           </Title>
         </motion.div>
 
-        <div className="flex flex-col col-span-full gap-6 lg:col-span-6 lg:mt-0">
-          {content.description && (
-            <motion.div {...itemProps} className="col-span-full lg:col-span-6 lg:max-w-[400px]">
-              <Text
-                className="!whitespace-pre-wrap !text-base-gray-200"
-                variant={TextVariant.BodyLarge}
-              >
-                {content.description}
-              </Text>
-            </motion.div>
-          )}
-
+        <div className="flex flex-col col-span-full gap-6 lg:col-span-6 lg:mt-0 lg:items-end lg:justify-end">
           {content.cta?.label && (
             <motion.div {...itemProps} className="block col-span-full sm:col-span-3">
               <Link href={content.cta.href}>
@@ -134,6 +123,17 @@ export function Section({ content, children, className, disableWrapperAnimation 
           <div className="col-span-full grid grid-cols-9 gap-x-[min(2.25vw,_32px)] gap-y-10 pt-2">
             {children}
           </div>
+        )}
+
+        {content.description && (
+          <motion.div {...itemProps} className="col-span-full lg:col-span-6 lg:max-w-[400px]">
+            <Text
+              className="!whitespace-pre-wrap !text-base-gray-200"
+              variant={TextVariant.BodyLarge}
+            >
+              {content.description}
+            </Text>
+          </motion.div>
         )}
       </WrapperComponent>
     </Container>

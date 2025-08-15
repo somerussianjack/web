@@ -22,7 +22,7 @@ export default async function Home() {
       <Container className="lg:pt-0">
         <div className="flex flex-col col-span-full gap-12">
           <Hero />
-          <SectionBaseEcosystem />
+          {false && <SectionBaseEcosystem />}
           <SectionBaseApp />
           <SectionBaseBuilders />
           <SectionBaseChain />

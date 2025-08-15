@@ -16,21 +16,37 @@ const prefix = PrefixAsset as ImageType;
 export function SectionBaseApp() {
   return (
     <Section content={content}>
-      <motion.div
-        className="col-span-full h-full max-h-[80svh] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
-        variants={itemContentVariants}
-      >
-        <Image
-          src={img.src}
-          alt="Base App"
-          width={img.width}
-          height={img.height}
-          className="mx-auto w-1/3 translate-y-[15%]"
-          draggable={false}
-          sizes="(max-width: 768px) 100vw, 450px"
-          quality={99}
-        />
-      </motion.div>
+      <div className="grid-base mb-base col-span-full min-h-[300px]">
+        <motion.div variants={itemContentVariants} className="col-span-2 row-span-2 w-full h-full">
+          <div className="overflow-hidden justify-center items-center w-full h-full rounded-lg bg-base-gray-25">
+            <Image
+              src={img.src}
+              alt="Base App"
+              width={img.width}
+              height={img.height}
+              className="mx-auto w-[70%] translate-y-[15%]"
+              draggable={false}
+              sizes="(max-width: 768px) 100vw, 450px"
+              quality={99}
+            />
+          </div>
+        </motion.div>
+
+        <motion.div className="col-span-1">
+          <div className="w-full rounded-base aspect-square bg-base-gray-25">
+            <p>PHONE</p>
+          </div>
+        </motion.div>
+        <motion.div variants={itemContentVariants} className="col-span-1">
+          <div className="w-full rounded-base aspect-square bg-base-gray-25">
+            <p>PHONE</p>
+          </div>
+        </motion.div>
+
+        <motion.div variants={itemContentVariants} className="col-span-2 col-start-3">
+          <div className="w-full rounded-base aspect-square bg-base-gray-25">Big</div>
+        </motion.div>
+      </div>
     </Section>
   );
 }
