@@ -15,12 +15,12 @@ export function Hero() {
       </div>
       <div className="grid-base col-span-full w-full pt-[180px]">
         <div className="col-span-1 col-start-3">
-          <div className="w-full rounded-base aspect-square">
+          <div className="w-full">
             <Title level={TitleLevel.H2Regular}>A full stack for the onchain economy</Title>
           </div>
         </div>
         <div className="col-span-1 col-start-4">
-          <div className="w-full rounded-base 5 aspect-square">
+          <div className="w-full">
             <Text variant={TextVariant.Body}>
               Base is a full stack for the onchain economy— empowering builders, creators, and
               people everywhere to build apps, grow businesses, create what they love, and earn
