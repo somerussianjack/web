@@ -8,6 +8,7 @@ import {
 import PrefixAsset from './prefix.svg';
 import { motion } from 'motion/react';
 import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
+import Image from 'next/image';
 
 const prefix = PrefixAsset as ImageType;
 
@@ -15,10 +16,26 @@ export function SectionBasePay() {
   return (
     <Section content={content}>
       <motion.div
-        className="col-span-full h-full max-h-[80svh] w-full items-center justify-center overflow-hidden rounded-lg"
+        className="relative col-span-full h-full max-h-[80svh] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
         variants={itemContentVariants}
       >
-        <VideoPlayer videoSrc="/videos/basepay.mp4" />
+        <VideoPlayer
+          style={{ mixBlendMode: 'multiply' }}
+          loop={false}
+          videoSrc="/videos/basepay-shapes.mp4"
+        />
+
+        <div className="flex absolute inset-0 justify-center items-center w-full h-full">
+          <div className="relative p-6 h-fit w-fit">
+            <Image
+              width={300}
+              height={300}
+              src="/images/base-pay-slide.png"
+              alt="Base Pay"
+              className="h-auto max-w-[300px] overflow-hidden rounded-xl object-contain"
+            />
+          </div>
+        </div>
       </motion.div>
     </Section>
   );

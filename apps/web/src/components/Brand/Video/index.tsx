@@ -20,9 +20,11 @@ export type VideoGridItemProps = {
   videoSrc: string;
   posterSrc?: string;
   tag?: RichTextContent;
+  loop?: boolean;
+  style?: React.CSSProperties;
 };
 
-export function VideoPlayer({ videoSrc, posterSrc, tag }: VideoGridItemProps) {
+export function VideoPlayer({ videoSrc, posterSrc, tag, loop = true, style }: VideoGridItemProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -55,9 +57,9 @@ export function VideoPlayer({ videoSrc, posterSrc, tag }: VideoGridItemProps) {
   }, [videoSrc]);
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative w-full h-full">
       {tag && (
-        <span className="absolute left-2 top-2 grid h-6 w-fit place-items-center px-2">
+        <span className="grid absolute top-2 left-2 place-items-center px-2 h-6 w-fit">
           <Text variant={TextVariant.CaptionMono} as="span" className="!text-base-gray-200">
             {tag}
           </Text>
@@ -66,8 +68,9 @@ export function VideoPlayer({ videoSrc, posterSrc, tag }: VideoGridItemProps) {
       <video
         ref={videoRef}
         poster={posterSrc}
-        className="h-full w-full rounded-lg bg-transparent object-cover"
-        loop
+        style={style}
+        className="object-cover w-full h-full bg-transparent rounded-lg"
+        loop={loop}
         muted
         playsInline
         preload="none"
@@ -132,7 +135,7 @@ export function VideoComponent({
     return (
       <Container className="border-t border-[#0A0B0D] pt-4 md:pt-5" id={id}>
         <div className="col-span-full mb-4 grid w-full flex-1 grid-cols-12 gap-x-[min(2.25vw,_32px)] md:mb-8 lg:col-span-9 lg:grid-cols-9">
-          <div className="col-span-full flex flex-col items-start gap-2 pb-4 md:col-span-3 md:pb-0">
+          <div className="flex flex-col col-span-full gap-2 items-start pb-4 md:col-span-3 md:pb-0">
             {prefix && (
               <Text variant={TextVariant.Body} as="span" className="text-base-gray-200">
                 {prefix}
@@ -142,7 +145,7 @@ export function VideoComponent({
               {title}
             </Title>
           </div>
-          <div className="col-span-full flex flex-col items-start gap-2 md:col-span-9 lg:col-span-6">
+          <div className="flex flex-col col-span-full gap-2 items-start md:col-span-9 lg:col-span-6">
             {description && (
               <Text variant={TextVariant.Body} as="span">
                 {description}
@@ -150,14 +153,14 @@ export function VideoComponent({
             )}
           </div>
         </div>
-        <div className="col-span-full h-full w-full flex-1 lg:col-span-9">{videoGridContent}</div>
+        <div className="flex-1 col-span-full w-full h-full lg:col-span-9">{videoGridContent}</div>
       </Container>
     );
   }
   return (
     <Container className="border-t border-[#0A0B0D] pt-4 md:pt-5" id={id}>
       <Aside prefix={prefix} title={title} description={description} />
-      <div className="relative col-span-full h-full flex-1 gap-8 md:col-span-9 lg:col-span-6">
+      <div className="relative flex-1 col-span-full gap-8 h-full md:col-span-9 lg:col-span-6">
         {videoGridContent}
       </div>
     </Container>

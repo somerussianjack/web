@@ -7,7 +7,8 @@ import {
 } from 'apps/web/src/components/base-org/root/Redesign/Section';
 import PrefixAsset from './prefix.svg';
 import Image from 'next/image';
-import ImageAsset from './asset.png';
+
+import ImageAsset from './base-app-phone.png';
 import { motion } from 'motion/react';
 
 const img = ImageAsset as ImageType;
@@ -18,17 +19,19 @@ export function SectionBaseApp() {
     <Section content={content}>
       <div className="grid-base mb-base col-span-full min-h-[300px]">
         <motion.div variants={itemContentVariants} className="col-span-2 row-span-2 w-full h-full">
-          <div className="overflow-hidden justify-center items-center w-full h-full rounded-lg bg-base-gray-25">
-            <Image
-              src={img.src}
-              alt="Base App"
-              width={img.width}
-              height={img.height}
-              className="mx-auto w-[70%] translate-y-[15%]"
-              draggable={false}
-              sizes="(max-width: 768px) 100vw, 450px"
-              quality={99}
-            />
+          <div className="overflow-hidden relative justify-center items-center w-full h-full rounded-lg bg-base-gray-25">
+            <div className="absolute inset-0 w-full h-full">
+              <Image
+                src={img.src}
+                alt="Base App"
+                width={img.width}
+                height={img.height}
+                className="mx-auto w-[90%] translate-y-[-2%]"
+                draggable={false}
+                sizes="(max-width: 768px) 100vw, 450px"
+                quality={99}
+              />
+            </div>
           </div>
         </motion.div>
 

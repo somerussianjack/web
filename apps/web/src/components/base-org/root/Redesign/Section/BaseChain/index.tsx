@@ -20,7 +20,18 @@ export function SectionBaseChain() {
   return (
     <Section content={content}>
       <div className="col-span-full">
-        <div className="relative aspect-video">
+        <div className="w-full grid-base">
+          <div className="col-span-2 row-span-2">
+            <div className="relative w-full h-full rounded-base aspect-square">
+              <div className="overflow-hidden absolute inset-0 w-full h-full">
+                <GlobeScene className="w-full h-full" />
+              </div>
+            </div>
+          </div>
+
+          <MetricsCardsOverlay />
+        </div>
+        {/* <div className="relative aspect-video">
           <GlobeScene className="flex w-full h-full max-h-full" />
           <div className="hidden sm:block">
             <div className="flex absolute inset-0 w-full h-full max-h-full pointer-events-none">
@@ -32,7 +43,7 @@ export function SectionBaseChain() {
         </div>
         <div className="block pt-8 sm:hidden">
           <MetricsCardsMobile />
-        </div>
+        </div> */}
       </div>
     </Section>
   );
@@ -40,12 +51,21 @@ export function SectionBaseChain() {
 
 function MetricsCardsOverlay() {
   return (
-    <div className="pointer-events-auto absolute left-8 top-1/2 z-10 flex w-[300px] max-w-80 -translate-y-1/2 flex-col gap-4 lg:w-[25%] lg:max-w-96">
-      <MetricCard title="Assets on Platform" icon={Icons.median} value="$12B" />
-      <MetricCard title="Total Transactions" icon={Icons.transactions} value="2.6B+" />
-      <MetricCard title="Block Time" icon={Icons.platform} value="200" unit="MS" />
-      <MetricCard title="Median Fee" icon={Icons.gasFees} value="<$0.01" />
-    </div>
+    <>
+      <div className="col-span-1">
+        <MetricCard title="Assets on Platform" icon={Icons.median} value="$12B" />
+      </div>
+      <div className="col-span-1">
+        <MetricCard title="Total Transactions" icon={Icons.transactions} value="2.6B+" />
+      </div>
+
+      <div className="col-span-1 col-start-3">
+        <MetricCard title="Block Time" icon={Icons.platform} value="200" unit="MS" />
+      </div>
+      <div className="col-span-1 col-start-4">
+        <MetricCard title="Median Fee" icon={Icons.gasFees} value="<$0.01" />
+      </div>
+    </>
   );
 }
 
@@ -232,7 +252,7 @@ export function AnimatedText({
 
 function MetricCard({ title, icon, value, unit }: MetricCardProps) {
   return (
-    <div className="pointer-events-none flex w-full flex-col rounded-lg bg-base-gray-25/90 p-4 backdrop-blur-sm md:w-[250px]">
+    <div className="flex flex-col justify-between p-4 w-full h-full rounded-lg backdrop-blur-sm pointer-events-none bg-base-gray-25/90">
       <div className="flex justify-between items-start mb-4">
         <div className="flex flex-col gap-1">
           <Text variant={TextVariant.Body}>{title}</Text>

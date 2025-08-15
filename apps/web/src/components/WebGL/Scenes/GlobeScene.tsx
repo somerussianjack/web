@@ -439,7 +439,7 @@ function GlobeScene({ className }: { className?: string }) {
     <div
       ref={containerRef}
       className={cn(
-        'w-full cursor-grab overflow-hidden active:cursor-grabbing min-h-[500px] md:min-h-[600px] lg:min-h-[700px] xl:min-h-[800px] max-h-[809px]',
+        'h-full max-h-[100%] w-full cursor-grab overflow-hidden active:cursor-grabbing md:min-h-[100%] lg:min-h-[100%] xl:min-h-[100%]',
         className,
       )}
     >
