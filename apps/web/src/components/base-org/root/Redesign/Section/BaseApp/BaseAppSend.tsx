@@ -1,3 +1,16 @@
+import { ImageType } from 'apps/web/src/components/base-org/root/Redesign/Section';
+import Image from 'next/image';
+
+import Avatar1 from './tba-avatar-1.png';
+import Avatar2 from './tba-avatar-2.png';
+import USA from './tba-usa.png';
+import HK from './tba-hk.png';
+
+const avatar1 = Avatar1 as ImageType;
+const avatar2 = Avatar2 as ImageType;
+const usa = USA as ImageType;
+const hk = HK as ImageType;
+
 export function BaseAppSend() {
   return (
     <div className="flex justify-center items-center w-full h-full group">
@@ -32,10 +45,25 @@ export function BaseAppSend() {
               className="bg-neutral-200 relative aspect-square translate-x-[12%] translate-y-[12%] rounded-lg
 					transition-all duration-300 group-hover:translate-y-[88%]"
             >
+              <Image
+                className="object-cover w-full h-full rounded-xl"
+                src={avatar1.src}
+                alt="Avatar"
+                width={avatar1.width}
+                height={avatar1.height}
+              />
               <div
                 className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] rounded-full
 						transition-all duration-300 group-hover:right-[90%]"
-              />
+              >
+                <Image
+                  className="object-cover w-full h-full"
+                  src={usa.src}
+                  alt="Avatar"
+                  width={usa.width}
+                  height={usa.height}
+                />
+              </div>
               <div className="absolute top-full">
                 <p>$130.00</p>
                 <p>130 USDC</p>
@@ -47,11 +75,24 @@ export function BaseAppSend() {
               className="bg-neutral-200 relative aspect-square translate-x-[-12%] translate-y-[-12%] rounded-lg
 					transition-all duration-300 group-hover:translate-y-[-88%]"
             >
+              <Image
+                className="object-cover w-full h-full rounded-xl"
+                src={avatar2.src}
+                alt="Avatar"
+                width={avatar2.width}
+                height={avatar2.height}
+              />
               <div
                 className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] rounded-full
 						transition-all duration-300 group-hover:right-[90%]"
               >
-                {/* Dot */}
+                <Image
+                  className="object-cover w-full h-full"
+                  src={hk.src}
+                  alt="Avatar"
+                  width={hk.width}
+                  height={hk.height}
+                />
               </div>
               <div className="absolute top-full transition-all duration-300 group-hover:translate-x-[30%]">
                 <p>Emma</p>
