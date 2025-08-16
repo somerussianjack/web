@@ -1,10 +1,10 @@
 export function BaseAppSend() {
   return (
-    <div className="flex justify-center items-center w-full h-full">
+    <div className="flex justify-center items-center w-full h-full group">
       <svg
         width="504"
         height="500"
-        className="w-full h-full"
+        className="h-full w-full scale-[0.98] transition-all duration-200 group-hover:scale-[0.95]"
         viewBox="0 0 504 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -25,6 +25,61 @@ export function BaseAppSend() {
         />
         <path d="M251.994 0V500" stroke="#DEE1E7" strokeWidth="3" strokeMiterlimit="10" />
       </svg>
+      <div className="flex absolute inset-0 justify-center items-center w-full h-full">
+        <div className="grid grid-cols-2 w-2/3">
+          <div className="col-span-1">
+            <div
+              className="bg-neutral-200 relative aspect-square translate-x-[12%] translate-y-[12%] rounded-lg
+					transition-all duration-300 group-hover:translate-y-[88%]"
+            >
+              <div
+                className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] rounded-full
+						transition-all duration-300 group-hover:right-[90%]"
+              />
+              <div className="absolute top-full">
+                <p>$130.00</p>
+                <p>130 USDC</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-1 col-start-2 row-start-2">
+            <div
+              className="bg-neutral-200 relative aspect-square translate-x-[-12%] translate-y-[-12%] rounded-lg
+					transition-all duration-300 group-hover:translate-y-[-88%]"
+            >
+              <div
+                className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] rounded-full
+						transition-all duration-300 group-hover:right-[90%]"
+              >
+                {/* Dot */}
+              </div>
+              <div className="absolute top-full transition-all duration-300 group-hover:translate-x-[30%]">
+                <p>Emma</p>
+                <p>emmaonchain.base.eth</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="absolute flex aspect-square w-[8%] items-center justify-center rounded-br-lg rounded-tl-lg bg-white transition-all duration-300
+			group-hover:rounded-bl-lg group-hover:rounded-br-none
+			group-hover:rounded-tl-none group-hover:rounded-tr-lg"
+        >
+          <svg
+            className="transition-all duration-300 group-hover:-rotate-180"
+            width="10"
+            height="14"
+            viewBox="0 0 10 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5.65329 10.3574L9.5412 6.46949V8.56412L4.9127 13.1926L0.28418 8.5641V6.46947L4.17217 10.3575L4.17217 0.111206H5.65329L5.65329 10.3574Z"
+              fill="#0A0B0D"
+            />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }
