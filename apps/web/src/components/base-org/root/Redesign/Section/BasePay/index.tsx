@@ -22,6 +22,7 @@ export function SectionBasePay() {
         <VideoPlayer
           style={{ mixBlendMode: 'multiply' }}
           loop={false}
+          scrollScrub
           videoSrc="/videos/basepay-shapes.mp4"
         />
 

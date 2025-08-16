@@ -22,9 +22,10 @@ export type VideoGridItemProps = {
   tag?: RichTextContent;
   loop?: boolean;
   style?: React.CSSProperties;
+  scrollScrub?: boolean;
 };
 
-export function VideoPlayer({ videoSrc, posterSrc, tag, loop = true, style }: VideoGridItemProps) {
+export function VideoPlayer({ videoSrc, posterSrc, tag, loop = true, style, scrollScrub = false }: VideoGridItemProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -33,28 +34,102 @@ export function VideoPlayer({ videoSrc, posterSrc, tag, loop = true, style }: Vi
       return;
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          if (!video.src) {
-            video.src = videoSrc;
+    // Load video source
+    if (!video.src) {
+      video.src = videoSrc;
+    }
+
+    if (scrollScrub) {
+      // For scroll scrub, we need to load metadata to get duration
+      video.preload = 'metadata';
+      
+      let isVideoInView = false;
+      
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          isVideoInView = entry.isIntersecting;
+          if (!isVideoInView) {
+            // Reset video to start when out of view
+            video.currentTime = 0;
           }
-          video.play().catch(() => {
-            // some browsers might block autoplay, ignore error
-          });
+        },
+        {
+          threshold: 0,
+        },
+      );
+
+      const handleScroll = () => {
+        if (!isVideoInView || video.duration === 0) return;
+
+        const rect = video.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        
+        // Calculate how much of the video is visible
+        // When video starts entering (bottom of video touches viewport top), progress = 0
+        // When video is fully visible (top of video reaches viewport top), progress = 1
+        const videoHeight = rect.height;
+        const videoTop = rect.top;
+        const videoBottom = rect.bottom;
+        
+        let progress = 0;
+        
+        if (videoBottom > 0 && videoTop < viewportHeight) {
+          // Video is at least partially visible
+          if (videoTop <= 0 && videoBottom >= viewportHeight) {
+            // Video is fully covering the viewport or larger
+            progress = Math.min(1, Math.abs(videoTop) / (videoHeight - viewportHeight));
+          } else if (videoTop > 0) {
+            // Video is entering from bottom
+            const visibleHeight = Math.min(videoHeight, viewportHeight - videoTop);
+            progress = visibleHeight / videoHeight;
+          } else {
+            // Video is exiting from top
+            const visibleHeight = Math.min(videoHeight, videoBottom);
+            progress = 1 - ((videoHeight - visibleHeight) / videoHeight);
+          }
         }
-      },
-      {
-        threshold: 0.5,
-      },
-    );
+        
+        // Clamp progress between 0 and 1
+        progress = Math.max(0, Math.min(1, progress));
+        
+        // Set video time based on progress
+        video.currentTime = progress * video.duration;
+      };
 
-    observer.observe(video);
+      observer.observe(video);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener('resize', handleScroll, { passive: true });
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [videoSrc]);
+      // Initial calculation
+      handleScroll();
+
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+      };
+    } else {
+      // Original autoplay behavior
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {
+              // some browsers might block autoplay, ignore error
+            });
+          }
+        },
+        {
+          threshold: 0.5,
+        },
+      );
+
+      observer.observe(video);
+
+      return () => {
+        observer.disconnect();
+      };
+    }
+  }, [videoSrc, scrollScrub]);
 
   return (
     <div className="relative w-full h-full">
@@ -73,7 +148,7 @@ export function VideoPlayer({ videoSrc, posterSrc, tag, loop = true, style }: Vi
         loop={loop}
         muted
         playsInline
-        preload="none"
+        preload={scrollScrub ? "metadata" : "none"}
       />
     </div>
   );

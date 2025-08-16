@@ -10,11 +10,11 @@ const prefix = PrefixAsset as ImageType;
 export function SectionBaseBuilders() {
   return (
     <Section content={content}>
-      <div className="relative col-span-full flex max-h-[700px] min-h-[500px] w-full items-center justify-center overflow-hidden rounded-lg md:min-h-[600px] md:bg-base-gray-25 lg:min-h-[700px] xl:min-h-[800px]">
+      <div className="relative col-span-full flex max-h-[700px] min-h-[500px] w-full items-center justify-center overflow-hidden rounded-lg md:min-h-[600px] md:bg-base-gray-25 lg:min-h-[600px] xl:min-h-[600px]">
         <div className="z-[9999]">
           <Terminal />
         </div>
-        <div className="absolute inset-0 h-full w-full">
+        <div className="absolute inset-0 w-full h-full">
           {/* <FaultyTerminal
             className="w-full h-full"
             scale={3}

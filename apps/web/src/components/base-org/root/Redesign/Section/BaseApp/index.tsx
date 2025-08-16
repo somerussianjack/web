@@ -8,6 +8,9 @@ import {
 import PrefixAsset from './prefix.svg';
 import Image from 'next/image';
 
+import { BaseAppSocial } from './BaseAppSocial';
+import { BaseAppSend } from './BaseAppSend';
+
 import ImageAsset from './base-app-phone.png';
 import { motion } from 'motion/react';
 
@@ -36,18 +39,24 @@ export function SectionBaseApp() {
         </motion.div>
 
         <motion.div className="col-span-1">
-          <div className="w-full rounded-base aspect-square bg-base-gray-25">
-            <p>PHONE</p>
+          <div className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
+            <div className="absolute inset-0 w-full h-full">
+              <BaseAppSocial />
+            </div>
           </div>
         </motion.div>
         <motion.div variants={itemContentVariants} className="col-span-1">
-          <div className="w-full rounded-base aspect-square bg-base-gray-25">
-            <p>PHONE</p>
+          <div className="w-full rounded-lg aspect-square bg-base-gray-25">
+            <p>sms</p>
           </div>
         </motion.div>
 
         <motion.div variants={itemContentVariants} className="col-span-2 col-start-3">
-          <div className="w-full rounded-base aspect-square bg-base-gray-25">Big</div>
+          <div className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
+            <div className="absolute inset-0 w-full h-full">
+              <BaseAppSend />
+            </div>
+          </div>
         </motion.div>
       </div>
     </Section>
