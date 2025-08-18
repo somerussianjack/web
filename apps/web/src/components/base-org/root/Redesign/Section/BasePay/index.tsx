@@ -7,8 +7,9 @@ import {
 } from 'apps/web/src/components/base-org/root/Redesign/Section';
 import PrefixAsset from './prefix.svg';
 import { motion } from 'motion/react';
-import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
+// import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
 import Image from 'next/image';
+import VideoCanvas from './VideoCanvas';
 
 const prefix = PrefixAsset as ImageType;
 
@@ -19,15 +20,17 @@ export function SectionBasePay() {
         className="relative col-span-full h-full max-h-[80svh] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
         variants={itemContentVariants}
       >
-        <VideoPlayer
+        {/* <VideoPlayer
           style={{ mixBlendMode: 'multiply' }}
           loop={false}
           scrollScrub
           videoSrc="/videos/basepay-shapes.mp4"
-        />
+        /> */}
 
-        <div className="flex absolute inset-0 justify-center items-center w-full h-full">
-          <div className="relative p-6 h-fit w-fit">
+        <VideoCanvas src="/videos/basepay-shapes.mp4" />
+
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center">
+          <div className="relative h-fit w-fit p-6">
             <Image
               width={300}
               height={300}
