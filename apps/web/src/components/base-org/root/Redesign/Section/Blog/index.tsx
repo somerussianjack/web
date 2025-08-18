@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { motion, AnimatePresence, Variants, cubicBezier } from 'motion/react';
 import { Section } from 'apps/web/src/components/base-org/root/Redesign/Section';
 import {
@@ -11,7 +10,6 @@ import classNames from 'classnames';
 import { levelStyles } from 'apps/web/src/components/base-org/typography/TitleRedesign';
 import { variantStyles } from 'apps/web/src/components/base-org/typography/TextRedesign';
 
-import AnimatedButton from 'apps/web/src/components/Button/AnimatedButton';
 import Text from 'apps/web/src/components/base-org/typography/TextRedesign';
 import { TextVariant } from 'apps/web/src/components/base-org/typography/TextRedesign/types';
 import Link from 'apps/web/src/components/Link';
@@ -21,102 +19,39 @@ export function SectionBlog() {
   return (
     <Section content={content}>
       <BlogCarousel />
-
-      <Link href="https://blog.base.org">
-        <AnimatedButton text="Read more" />
-      </Link>
     </Section>
   );
 }
 
 const content = {
   title: 'Read the latest from Base',
+  cta: {
+    label: 'Read more',
+    href: 'https://blog.base.org',
+  },
 };
 
-function BlogCarouselControls({
-  displayedPosts,
-  currentIndex,
-  onDotClick,
-}: {
-  displayedPosts: BlogPost[];
-  currentIndex: number;
-  onDotClick: (index: number) => () => void;
-}) {
-  return (
-    <motion.div
-      className="absolute bottom-4 left-4 z-30 md:bottom-[52px] md:left-auto md:right-6 xl:bottom-[48px] xl:right-12"
-      variants={controlsVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <div className="flex gap-3">
-        {displayedPosts.map((post, index) => (
-          <motion.button
-            key={post.title}
-            onClick={onDotClick(index)}
-            className="relative w-10 h-10 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-          >
-            <motion.div
-              animate={getBackgroundColor(index === currentIndex)}
-              transition={blogCardTransition}
-              className={classNames(
-                'flex h-full w-full items-center justify-center rounded-sm border',
-                {
-                  'border-base-gray-150': index !== currentIndex,
-                  'border-base-blue': index === currentIndex,
-                },
-              )}
-            >
-              <motion.span
-                className={variantStyles['body-mono']}
-                animate={getTextColor(index === currentIndex)}
-                transition={blogCardTransition}
-              >
-                {(index + 1).toString().padStart(2, '0')}
-              </motion.span>
-            </motion.div>
-          </motion.button>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
 function BlogCarousel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const displayedPosts = blogPosts.slice(0, 5);
-
-  const handleDotClick = useCallback(
-    (newIndex: number) => () => {
-      setCurrentIndex(newIndex);
-    },
-    [],
-  );
-
-  const currentPost = displayedPosts[currentIndex];
+  const displayedPosts: BlogPost[] = blogPosts.slice(0, 2);
 
   return (
-    <div className="overflow-hidden relative col-span-full rounded-lg">
+    <div className="overflow-hidden relative col-span-full grid-base">
       {/* blog card container */}
-      <div className="0-h-[400px] 0-md:h-[500px] 0-lg:h-[700px] relative col-span-full">
-        <BlogCard
-          title={currentPost.title}
-          subtitle={currentPost.subtitle}
-          href={currentPost.href}
-          backgroundImage={currentPost.previewImage}
-          slideNumber={currentIndex + 1}
-          animationKey={currentIndex}
-          brightness={currentPost.brightness}
-          contrast={currentPost.contrast}
-        />
-      </div>
-
-      {/* controls */}
-      <BlogCarouselControls
-        displayedPosts={displayedPosts}
-        currentIndex={currentIndex}
-        onDotClick={handleDotClick}
-      />
+      {displayedPosts.map((post, index) => (
+        <div key={post.href} className="relative col-span-2">
+          <BlogCard
+            key={post.href}
+            title={post.title}
+            subtitle={post.subtitle}
+            href={post.href}
+            backgroundImage={post.previewImage}
+            slideNumber={index + 1}
+            animationKey={index}
+            brightness={post.brightness}
+            contrast={post.contrast}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -155,7 +90,7 @@ function BlogCardContent({
   animationKey: number;
 }) {
   return (
-    <div className="relative flex flex-[3] bg-base-gray-25 md:flex-none">
+    <div className="relative flex flex-[3] md:flex-none">
       <BlogCardSlideNumber slideNumber={slideNumber} />
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -167,7 +102,7 @@ function BlogCardContent({
           exit="exit"
           transition={blogCardTransition}
         >
-          <div className="p-4 pt-8 w-full sm:pt-12 md:px-6 md:py-12 xl:px-12">
+          <div className="pb-8 w-full sm:pb-12 md:px-0 md:pb-12 xl:px-0">
             <div className="flex justify-between items-end">
               {/* text */}
               <div className="flex flex-1 flex-col gap-4 md:max-w-[380px] lg:max-w-[420px] xl:h-36 xl:max-w-[600px]">
@@ -185,7 +120,7 @@ function BlogCardContent({
                 <motion.div
                   className={classNames(
                     variantStyles.body,
-                    'hidden text-pretty !text-base-gray-200 xl:line-clamp-3 xl:block xl:h-auto',
+                    'text-pretty !text-base-gray-200 xl:line-clamp-3 xl:block xl:h-auto',
                   )}
                   initial={textConfig2.initial}
                   animate={textConfig2.animate}
@@ -224,18 +159,18 @@ function BlogCard({
       target={href.startsWith('https') ? '_blank' : '_self'}
       className={classNames('flex overflow-hidden relative flex-col w-full h-full', className)}
     >
+      <BlogCardContent
+        title={title}
+        subtitle={subtitle}
+        slideNumber={slideNumber}
+        animationKey={animationKey}
+      />
       <BlogCardImage
         backgroundImage={backgroundImage}
         title={title}
         brightness={brightness}
         contrast={contrast}
         shader={false}
-      />
-      <BlogCardContent
-        title={title}
-        subtitle={subtitle}
-        slideNumber={slideNumber}
-        animationKey={animationKey}
       />
     </Link>
   );
@@ -278,14 +213,6 @@ const textConfig2 = {
   },
 };
 
-const getBackgroundColor = (isActive: boolean) => ({
-  backgroundColor: isActive ? '#0000ff' : 'transparent',
-});
-
-const getTextColor = (isActive: boolean) => ({
-  color: isActive ? '#ffffff' : '#0a0b0d',
-});
-
 const textVariants: Variants = {
   enter: {
     opacity: 0,
@@ -295,11 +222,5 @@ const textVariants: Variants = {
   },
   exit: {
     opacity: 0,
-  },
-};
-
-const controlsVariants: Variants = {
-  visible: {
-    transition: blogCardTransition,
   },
 };
