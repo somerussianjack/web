@@ -458,6 +458,18 @@ function GlobeScene({ className }: { className?: string }) {
     };
   }, [damping, autoRotationSpeed, lerpStrength]);
 
+  // Run handleResize on mount with 100ms delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        handleResize(rect.width, rect.height);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [handleResize]);
+
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {

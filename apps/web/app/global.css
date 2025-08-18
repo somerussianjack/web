@@ -94,5 +94,10 @@ body {
 .grid-base {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2.3255%;
+  column-gap: 2.3255%;
+  row-gap: 2.3255%;
+
+  @media (max-width: 768px) {
+    row-gap: calc(2.3255vw);
+  }
 }

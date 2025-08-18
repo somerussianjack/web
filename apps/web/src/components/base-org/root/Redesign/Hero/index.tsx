@@ -9,7 +9,7 @@ import { TextVariant } from 'apps/web/src/components/base-org/typography/TextRed
 export function Hero() {
   return (
     <Container className="!lg:mb-0 !mb-0 grid-cols-9 gap-y-12">
-      <div className="col-span-full flex h-[calc(100vh-120px)] flex-col justify-between">
+      <div className="col-span-full flex h-[calc(100vh-80px)] flex-col justify-between">
         <div className="relative col-span-full pb-0 w-full">
           <LogoHero />
           <AnimatedTitle />

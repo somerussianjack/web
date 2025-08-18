@@ -10,9 +10,11 @@ import Image from 'next/image';
 
 import { BaseAppSocial } from './BaseAppSocial';
 import { BaseAppSend } from './BaseAppSend';
+import { BaseAppSms } from './BaseAppSms';
 
 import ImageAsset from './base-app-phone.png';
 import { motion } from 'motion/react';
+import { ParallaxScaleWrapper } from './ParallaxScaleWrapper';
 
 const img = ImageAsset as ImageType;
 const prefix = PrefixAsset as ImageType;
@@ -26,18 +28,24 @@ export function SectionBaseApp() {
           className="col-span-full w-full h-full md:col-span-2 md:row-span-2"
         >
           <div className="overflow-hidden relative justify-center items-center w-full h-full rounded-lg aspect-square bg-base-gray-25 md:aspect-auto">
-            <div className="absolute inset-0 w-full h-full">
-              <Image
-                src={img.src}
-                alt="Base App"
-                width={img.width}
-                height={img.height}
-                className="mx-auto w-[90%] translate-y-[-2%]"
-                draggable={false}
-                sizes="(max-width: 768px) 100vw, 450px"
-                quality={99}
-              />
-            </div>
+            <ParallaxScaleWrapper
+              parallaxMultiplier={1.05}
+              maxScale={1.1}
+              scrollRange={{ start: 0.8, end: 0.2 }}
+            >
+              <div className="absolute inset-0 w-full h-full">
+                <Image
+                  src={img.src}
+                  alt="Base App"
+                  width={img.width}
+                  height={img.height}
+                  className="mx-auto w-[90%] translate-y-[-2%]"
+                  draggable={false}
+                  sizes="(max-width: 768px) 100vw, 450px"
+                  quality={99}
+                />
+              </div>
+            </ParallaxScaleWrapper>
           </div>
         </motion.div>
 
@@ -49,8 +57,10 @@ export function SectionBaseApp() {
           </div>
         </motion.div>
         <motion.div variants={itemContentVariants} className="col-span-2 md:col-span-1">
-          <div className="w-full rounded-lg aspect-square bg-base-gray-25">
-            <p>sms</p>
+          <div className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
+            <div className="absolute inset-0 w-full h-full">
+              <BaseAppSms />
+            </div>
           </div>
         </motion.div>
 
