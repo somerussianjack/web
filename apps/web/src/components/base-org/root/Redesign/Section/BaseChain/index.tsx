@@ -18,7 +18,7 @@ const prefix = PrefixAsset as ImageType;
 
 export function SectionBaseChain() {
   return (
-    <Section content={content}>
+    <Section disableWrapperAnimation content={content}>
       <div className="col-span-full">
         <div className="w-full grid-base">
           <div className="col-span-full md:col-span-2 row-span-2">
