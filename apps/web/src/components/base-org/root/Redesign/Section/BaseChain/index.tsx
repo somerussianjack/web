@@ -31,19 +31,6 @@ export function SectionBaseChain() {
 
           <MetricsCardsOverlay />
         </div>
-        {/* <div className="relative aspect-video">
-          <GlobeScene className="flex w-full h-full max-h-full" />
-          <div className="hidden sm:block">
-            <div className="flex absolute inset-0 w-full h-full max-h-full pointer-events-none">
-              <div className="flex relative flex-col justify-center items-center w-full h-full">
-                <MetricsCardsOverlay />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="block pt-8 sm:hidden">
-          <MetricsCardsMobile />
-        </div> */}
       </div>
     </Section>
   );
@@ -66,17 +53,6 @@ function MetricsCardsOverlay() {
         <MetricCard title="Median Fee" icon={Icons.gasFees} value="<$0.01" />
       </div>
     </>
-  );
-}
-
-function MetricsCardsMobile() {
-  return (
-    <div className="flex flex-col gap-4 pt-4">
-      <MetricCard title="Assets on Platform" icon={Icons.median} value="$12B" />
-      <MetricCard title="Total Transactions" icon={Icons.transactions} value="2.6B+" />
-      <MetricCard title="Block Time" icon={Icons.platform} value="200" unit="MS" />
-      <MetricCard title="Median Fee" icon={Icons.gasFees} value="<$0.01" />
-    </div>
   );
 }
 
