@@ -32,7 +32,7 @@ export function SectionBaseApp() {
               parallaxMultiplier={1.05}
               maxScale={1.1}
               startingScale={0.8}
-              scrollRange={{ start: 0.8, end: 0.2 }}
+              scrollRange={{ start: 0.99, end: 0.0 }}
             >
               <div className="absolute inset-0 w-full h-full">
                 <Image
