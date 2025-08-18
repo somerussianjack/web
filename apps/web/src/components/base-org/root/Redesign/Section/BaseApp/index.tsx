@@ -21,8 +21,11 @@ export function SectionBaseApp() {
   return (
     <Section content={content}>
       <div className="grid-base mb-base col-span-full min-h-[300px]">
-        <motion.div variants={itemContentVariants} className="col-span-2 row-span-2 w-full h-full">
-          <div className="overflow-hidden relative justify-center items-center w-full h-full rounded-lg bg-base-gray-25">
+        <motion.div
+          variants={itemContentVariants}
+          className="col-span-full w-full h-full md:col-span-2 md:row-span-2"
+        >
+          <div className="overflow-hidden relative justify-center items-center w-full h-full rounded-lg aspect-square bg-base-gray-25 md:aspect-auto">
             <div className="absolute inset-0 w-full h-full">
               <Image
                 src={img.src}
@@ -38,20 +41,23 @@ export function SectionBaseApp() {
           </div>
         </motion.div>
 
-        <motion.div className="col-span-1">
+        <motion.div className="col-span-2 md:col-span-1">
           <div className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
             <div className="absolute inset-0 w-full h-full">
               <BaseAppSocial />
             </div>
           </div>
         </motion.div>
-        <motion.div variants={itemContentVariants} className="col-span-1">
+        <motion.div variants={itemContentVariants} className="col-span-2 md:col-span-1">
           <div className="w-full rounded-lg aspect-square bg-base-gray-25">
             <p>sms</p>
           </div>
         </motion.div>
 
-        <motion.div variants={itemContentVariants} className="col-span-2 col-start-3">
+        <motion.div
+          variants={itemContentVariants}
+          className="col-span-full md:col-span-2 md:col-start-3"
+        >
           <div className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
             <div className="absolute inset-0 w-full h-full">
               <BaseAppSend />

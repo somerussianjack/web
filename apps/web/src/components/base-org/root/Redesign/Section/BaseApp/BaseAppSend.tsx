@@ -53,8 +53,8 @@ export function BaseAppSend() {
                 height={avatar1.height}
               />
               <div
-                className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] rounded-full
-						transition-all duration-300 group-hover:right-[90%]"
+                className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] overflow-hidden
+						rounded-full transition-all duration-300 group-hover:right-[90%]"
               >
                 <Image
                   className="object-cover w-full h-full"
@@ -83,8 +83,8 @@ export function BaseAppSend() {
                 height={avatar2.height}
               />
               <div
-                className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] rounded-full
-						transition-all duration-300 group-hover:right-[90%]"
+                className="bg-red-500 absolute -right-[10%] -top-[10%] aspect-square w-[20%] overflow-hidden
+						rounded-full transition-all duration-300 group-hover:right-[90%]"
               >
                 <Image
                   className="object-cover w-full h-full"
