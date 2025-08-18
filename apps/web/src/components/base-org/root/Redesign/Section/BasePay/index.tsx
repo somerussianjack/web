@@ -27,9 +27,9 @@ export function SectionBasePay() {
           videoSrc="/videos/basepay-shapes.mp4"
         /> */}
 
-        <VideoCanvas src="/videos/basepay-shapes.mp4" />
+        <VideoCanvas className="mix-blend-multiply" src="/videos/basepay-shapes.mp4" />
 
-        <div className="hidden absolute inset-0 justify-center items-center w-full h-full flex0">
+        <div className="flex absolute inset-0 justify-center items-center w-full h-full">
           <div className="relative p-6 h-fit w-fit">
             <Image
               width={300}

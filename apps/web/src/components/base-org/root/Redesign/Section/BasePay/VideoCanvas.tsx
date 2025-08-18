@@ -16,40 +16,94 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
 
   // State
   const [hasStartedScrubbing, setHasStartedScrubbing] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [framesLoaded, setFramesLoaded] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [frameCache, setFrameCache] = useState<ImageData[]>([]);
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [canvasHeight, setCanvasHeight] = useState(600);
-  const [debugInfo, setDebugInfo] = useState('');
 
-  const setupCanvasSize = useCallback(() => {
+  // Refs for values that need to be accessed in stable callbacks
+  const scrollProgressRef = useRef(0);
+  const framesLoadedRef = useRef(false);
+  const frameCacheRef = useRef<ImageData[]>([]);
+  const hasStartedScrubbingRef = useRef(false);
+
+  // Update refs when state changes
+  useEffect(() => {
+    framesLoadedRef.current = framesLoaded;
+  }, [framesLoaded]);
+
+  useEffect(() => {
+    frameCacheRef.current = frameCache;
+  }, [frameCache]);
+
+  useEffect(() => {
+    hasStartedScrubbingRef.current = hasStartedScrubbing;
+  }, [hasStartedScrubbing]);
+
+  // Removed setupCanvasSize as it's now inline in useEffect
+
+  const handleScroll = useCallback(() => {
     const canvas = canvasRef.current;
-    const canvasContainer = canvasContainerRef.current;
+    const context = contextRef.current;
+    const currentFramesLoaded = framesLoadedRef.current;
+    const currentFrameCache = frameCacheRef.current;
 
-    if (!canvas || !canvasContainer) return;
+    if (!canvas || !context || !currentFramesLoaded || currentFrameCache.length === 0) return;
 
-    const rect = canvasContainer.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const rect = canvas.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const elementHeight = rect.height;
 
-    setCanvasWidth(width);
-    setCanvasHeight(height);
+    let progress = 0;
 
-    canvas.width = width;
-    canvas.height = height;
+    // Check if element is completely off-screen
+    if (rect.bottom <= 0 || rect.top >= windowHeight) {
+      // Element is completely outside viewport (above or below) - video at start (0%)
+      progress = 0;
+    } else {
+      // Element is in viewport - calculate progress based on scroll position
+      // Progress should be 0% when element just enters viewport and 100% when fully visible
+
+      if (rect.top <= 0 && rect.bottom >= windowHeight) {
+        // Element is larger than viewport and fully covers it
+        progress = 1;
+      } else if (rect.top >= 0 && rect.bottom <= windowHeight) {
+        // Element is fully visible within viewport
+        progress = 1;
+      } else if (rect.top > 0) {
+        // Element is entering from bottom
+        const visibleHeight = windowHeight - rect.top;
+        progress = Math.min(1, visibleHeight / elementHeight);
+      } else {
+        // Element is exiting from top
+        const visibleHeight = rect.bottom;
+        progress = Math.min(1, visibleHeight / elementHeight);
+      }
+    }
+
+    // Clamp progress between 0 and 1
+    progress = Math.max(0, Math.min(1, progress));
+    scrollProgressRef.current = progress;
+
+    // Use preloaded frames for instant scrubbing
+    const frameIndex = Math.floor(progress * (currentFrameCache.length - 1));
+    const clampedIndex = Math.max(0, Math.min(currentFrameCache.length - 1, frameIndex));
+
+    // Draw the frame instantly from cache
+    context.putImageData(currentFrameCache[clampedIndex], 0, 0);
   }, []);
 
   const setupResizeObserver = useCallback(() => {
     const canvasContainer = canvasContainerRef.current;
-    const canvas = canvasRef.current;
 
     if (!canvasContainer) return;
 
     resizeObserverRef.current = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
+        const canvas = canvasRef.current;
+
         setCanvasWidth(width);
         setCanvasHeight(height);
 
@@ -57,27 +111,22 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
           canvas.width = width;
           canvas.height = height;
 
-          // Redraw current frame if frames are loaded
-          if (framesLoaded && frameCache.length > 0) {
-            const frameIndex = Math.floor(scrollProgress * (frameCache.length - 1));
-            const clampedIndex = Math.max(0, Math.min(frameCache.length - 1, frameIndex));
-            if (contextRef.current) {
-              contextRef.current.putImageData(frameCache[clampedIndex], 0, 0);
-            }
-          }
+          // Trigger scroll handler to redraw the frame with correct dimensions
+          handleScroll();
         }
       }
     });
 
     resizeObserverRef.current.observe(canvasContainer);
-  }, [framesLoaded, frameCache, scrollProgress]);
+  }, [handleScroll]);
 
   const preloadFrames = useCallback(async () => {
     const video = videoRef.current;
     const context = contextRef.current;
+    const canvas = canvasRef.current;
 
-    if (!video || !context) {
-      console.warn('Video or context not available for frame preloading');
+    if (!video || !context || !canvas) {
+      console.warn('Video, context, or canvas not available for frame preloading');
       return;
     }
 
@@ -87,7 +136,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     }
 
     const duration = video.duration;
-    const fps = 30; // Assuming 30fps, adjust based on your video
+    const fps = 34; // Assuming 30fps, adjust based on your video
     const totalFramesCount = Math.floor(duration * fps);
 
     // Limit frames for memory management (max 200 frames for better performance)
@@ -96,10 +145,14 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     const newFrameCache: ImageData[] = [];
     setLoadingProgress(0);
 
+    // Use current canvas dimensions
+    const currentWidth = canvas.width;
+    const currentHeight = canvas.height;
+
     // Create a temporary canvas for frame extraction
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvasWidth;
-    tempCanvas.height = canvasHeight;
+    tempCanvas.width = currentWidth;
+    tempCanvas.height = currentHeight;
     const tempContext = tempCanvas.getContext('2d');
 
     if (!tempContext) {
@@ -185,12 +238,12 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
       setLoadingProgress(0);
       setFramesLoaded(false);
     }
-  }, [canvasWidth, canvasHeight]);
+  }, []);
 
   const initializeVideo = useCallback(async () => {
     const canvas = canvasRef.current;
 
-    if (!canvas) return;
+    if (!canvas || !src) return;
 
     try {
       // Get canvas context
@@ -227,61 +280,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     }
   }, [src, preloadFrames]);
 
-  const handleScroll = useCallback(() => {
-    const canvas = canvasRef.current;
-    const context = contextRef.current;
-
-    if (!canvas || !context || !framesLoaded || frameCache.length === 0) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const elementHeight = rect.height;
-
-    let progress = 0;
-
-    // Check if element is completely off-screen
-    if (rect.bottom <= 0 || rect.top >= windowHeight) {
-      // Element is completely outside viewport (above or below) - video at start (0%)
-      progress = 0;
-    } else {
-      // Element is in viewport - calculate progress based on scroll position
-      // Progress should be 0% when element just enters viewport and 100% when fully visible
-
-      if (rect.top <= 0 && rect.bottom >= windowHeight) {
-        // Element is larger than viewport and fully covers it
-        progress = 1;
-      } else if (rect.top >= 0 && rect.bottom <= windowHeight) {
-        // Element is fully visible within viewport
-        progress = 1;
-      } else if (rect.top > 0) {
-        // Element is entering from bottom
-        const visibleHeight = windowHeight - rect.top;
-        progress = Math.min(1, visibleHeight / elementHeight);
-      } else {
-        // Element is exiting from top
-        const visibleHeight = rect.bottom;
-        progress = Math.min(1, visibleHeight / elementHeight);
-      }
-    }
-
-    // Clamp progress between 0 and 1
-    progress = Math.max(0, Math.min(1, progress));
-    setScrollProgress(progress);
-
-    // Update debug info
-    setDebugInfo(
-      `Progress: ${(progress * 100).toFixed(1)}% | Frame: ${Math.floor(
-        progress * (frameCache.length - 1),
-      )} | Rect: top=${rect.top.toFixed(0)}, bottom=${rect.bottom.toFixed(0)}`,
-    );
-
-    // Use preloaded frames for instant scrubbing
-    const frameIndex = Math.floor(progress * (frameCache.length - 1));
-    const clampedIndex = Math.max(0, Math.min(frameCache.length - 1, frameIndex));
-
-    // Draw the frame instantly from cache
-    context.putImageData(frameCache[clampedIndex], 0, 0);
-  }, [framesLoaded, frameCache]);
+  // Duplicate handleScroll removed - using the one defined above
 
   const setupIntersectionObserver = useCallback(() => {
     const canvas = canvasRef.current;
@@ -291,13 +290,15 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     intersectionObserverRef.current = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
+        const currentHasStartedScrubbing = hasStartedScrubbingRef.current;
 
-        if (entry.isIntersecting && !hasStartedScrubbing) {
+        if (entry.isIntersecting && !currentHasStartedScrubbing) {
           setHasStartedScrubbing(true);
+          hasStartedScrubbingRef.current = true;
           window.addEventListener('scroll', handleScroll, { passive: true });
           // Trigger initial scroll calculation
           handleScroll();
-        } else if (!entry.isIntersecting && hasStartedScrubbing) {
+        } else if (!entry.isIntersecting && currentHasStartedScrubbing) {
           // Stop scrubbing when element is no longer near the viewport
           const rect = canvas.getBoundingClientRect();
           const windowHeight = window.innerHeight;
@@ -305,6 +306,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
           // Stop if element is far above or below viewport (with more generous margin)
           if (rect.bottom < -windowHeight || rect.top > windowHeight * 2) {
             setHasStartedScrubbing(false);
+            hasStartedScrubbingRef.current = false;
             window.removeEventListener('scroll', handleScroll);
           } else {
             // Still trigger scroll update even when not intersecting to handle off-screen cases
@@ -319,7 +321,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     );
 
     intersectionObserverRef.current.observe(canvas);
-  }, [hasStartedScrubbing, handleScroll]);
+  }, [handleScroll]);
 
   const cleanup = useCallback(() => {
     if (intersectionObserverRef.current) {
@@ -330,37 +332,54 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
       resizeObserverRef.current.disconnect();
     }
 
-    if (hasStartedScrubbing) {
-      window.removeEventListener('scroll', handleScroll);
-    }
+    // Remove scroll listener if it was added
+    window.removeEventListener('scroll', handleScroll);
 
     if (videoRef.current) {
       videoRef.current.removeAttribute('src');
       videoRef.current.load();
     }
-  }, [hasStartedScrubbing, handleScroll]);
+  }, [handleScroll]);
 
-  // Component lifecycle
+  // Handle canvas resizing separately from video initialization
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const canvasContainer = canvasContainerRef.current;
+
+    if (!canvas || !canvasContainer) return;
+
+    // Call functions directly instead of through callbacks
+    // Setup canvas size
+    const rect = canvasContainer.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    setCanvasWidth(width);
+    setCanvasHeight(height);
+    canvas.width = width;
+    canvas.height = height;
+
+    // Setup resize observer
+    setupResizeObserver();
+
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+    };
+  }, [setupResizeObserver]); // Include setupResizeObserver dependency
+
+  // Component lifecycle - video initialization
   useEffect(() => {
     const canvas = canvasRef.current;
     const canvasContainer = canvasContainerRef.current;
 
     if (!canvas || !canvasContainer || !src) return;
 
-    setupCanvasSize();
-    setupResizeObserver();
     void initializeVideo();
     setupIntersectionObserver();
 
     return cleanup;
-  }, [
-    src,
-    setupCanvasSize,
-    setupResizeObserver,
-    initializeVideo,
-    setupIntersectionObserver,
-    cleanup,
-  ]);
+  }, [src, initializeVideo, setupIntersectionObserver, cleanup]);
 
   return (
     <div ref={canvasContainerRef} className={`relative w-full h-full ${className}`}>
@@ -386,13 +405,6 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
             </div>
             <div className="mt-2 text-sm">{Math.round(loadingProgress * 100)}%</div>
           </div>
-        </div>
-      )}
-
-      {/* Debug Info - Remove this in production */}
-      {process.env.NODE_ENV === 'development' && debugInfo && (
-        <div className="absolute top-2 left-2 p-2 font-mono text-xs text-white bg-black bg-opacity-75 rounded">
-          {debugInfo}
         </div>
       )}
     </div>

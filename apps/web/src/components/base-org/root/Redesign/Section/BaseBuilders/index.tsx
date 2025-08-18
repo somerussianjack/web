@@ -3,6 +3,7 @@
 import { ImageType, Section } from 'apps/web/src/components/base-org/root/Redesign/Section';
 import PrefixAsset from './prefix.svg';
 import { Terminal } from './Terminal';
+import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
 // import FaultyTerminal from './FaultyTerminal';
 
 const prefix = PrefixAsset as ImageType;
@@ -24,6 +25,7 @@ export function SectionBaseBuilders() {
             scanlineIntensity={0.0}
             tint="#8F8FFF"
           /> */}
+          <VideoPlayer loop={false} videoSrc="/videos/bg-terminal.mp4" />
         </div>
       </div>
     </Section>
