@@ -15,12 +15,12 @@ export function Hero() {
           <AnimatedTitle />
         </div>
         <div className="col-span-full w-full grid-base">
-          <div className="col-span-2 md:col-span-1 md:col-start-3">
+          {/* <div className="col-span-2 md:col-span-1 md:col-start-3">
             <div className="w-full">
               <Title level={TitleLevel.H2Regular}>A full stack for the onchain economy</Title>
             </div>
-          </div>
-          <div className="col-span-2 md:col-span-1 md:col-start-4">
+          </div> */}
+          <div className="col-span-2 col-start-3">
             <div className="w-full">
               <Text variant={TextVariant.Body}>
                 Base is a full stack for the onchain economy— empowering builders, creators, and

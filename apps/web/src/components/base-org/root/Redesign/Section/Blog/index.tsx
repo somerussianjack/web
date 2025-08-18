@@ -35,10 +35,10 @@ function BlogCarousel() {
   const displayedPosts: BlogPost[] = blogPosts.slice(0, 2);
 
   return (
-    <div className="overflow-hidden relative col-span-full grid-base">
+    <div className="overflow-hidden relative col-span-full grid-base !gap-y-[80px]">
       {/* blog card container */}
       {displayedPosts.map((post, index) => (
-        <div key={post.href} className="relative col-span-2">
+        <div key={post.href} className="relative col-span-full md:col-span-2">
           <BlogCard
             key={post.href}
             title={post.title}

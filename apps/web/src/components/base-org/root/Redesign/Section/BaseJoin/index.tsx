@@ -19,7 +19,7 @@ export function SectionBaseJoin() {
           <Link
             key={card.index}
             href={card.href}
-            className="col-span-1 w-full flex-1 overflow-hidden !rounded-[8px]"
+            className="col-span-2 md:col-span-1 w-full flex-1 overflow-hidden !rounded-[8px]"
           >
             <InteractiveCard
               shader={false}

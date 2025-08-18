@@ -12,10 +12,18 @@ export interface ParallaxScaleWrapperProps {
    */
   parallaxMultiplier?: number;
   /**
+   * Starting scale factor for the scale effect
+   * - 1.0: starts at normal size
+   * - 0.8: starts at 80% size
+   * - 1.2: starts at 120% size
+   * Scale starts at startingScale and grows to maxScale based on scroll progress
+   */
+  startingScale?: number;
+  /**
    * Maximum scale factor for the scale effect
    * - 1.0: no scale effect
    * - 1.2: scales up to 120% at maximum
-   * Scale starts at 1.0 and grows to maxScale based on scroll progress
+   * Scale starts at startingScale and grows to maxScale based on scroll progress
    */
   maxScale?: number;
   /**
@@ -48,6 +56,7 @@ export interface ParallaxScaleWrapperProps {
 export function ParallaxScaleWrapper({
   children,
   parallaxMultiplier = 1,
+  startingScale = 1,
   maxScale = 1,
   className = '',
   disableParallax = false,
@@ -97,7 +106,7 @@ export function ParallaxScaleWrapper({
 
       // Apply easing for smoother scale transition
       const easedProgress = progress * progress * (3 - 2 * progress); // smoothstep
-      const currentScale = 1 + (maxScale - 1) * easedProgress;
+      const currentScale = startingScale + (maxScale - startingScale) * easedProgress;
       transforms.push(`scale(${currentScale})`);
     }
 
@@ -111,7 +120,7 @@ export function ParallaxScaleWrapper({
     // Apply transforms
     element.style.transform = transforms.length > 0 ? transforms.join(' ') : '';
     element.style.willChange = transforms.length > 0 ? 'transform' : 'auto';
-  }, [isInView, disableParallax, disableScale, maxScale, parallaxMultiplier, scrollRange]);
+  }, [isInView, disableParallax, disableScale, maxScale, parallaxMultiplier, scrollRange, startingScale]);
 
   // Intersection Observer for performance optimization
   useEffect(() => {

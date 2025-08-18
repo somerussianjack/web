@@ -21,14 +21,13 @@ export function SectionBaseChain() {
     <Section content={content}>
       <div className="col-span-full">
         <div className="w-full grid-base">
-          <div className="col-span-2 row-span-2">
+          <div className="col-span-full md:col-span-2 row-span-2">
             <div className="relative w-full h-full rounded-base aspect-square">
               <div className="overflow-hidden absolute inset-0 w-full h-full">
                 <GlobeScene className="w-full h-full" />
               </div>
             </div>
           </div>
-
           <MetricsCardsOverlay />
         </div>
       </div>
@@ -39,17 +38,17 @@ export function SectionBaseChain() {
 function MetricsCardsOverlay() {
   return (
     <>
-      <div className="col-span-1">
+      <div className="col-span-2 md:col-span-1">
         <MetricCard title="Assets on Platform" icon={Icons.median} value="$12B" />
       </div>
-      <div className="col-span-1">
+      <div className="col-span-2 md:col-span-1">
         <MetricCard title="Total Transactions" icon={Icons.transactions} value="2.6B+" />
       </div>
 
-      <div className="col-span-1 col-start-3">
+      <div className="col-span-2 md:col-span-1 md:col-start-3">
         <MetricCard title="Block Time" icon={Icons.platform} value="200" unit="MS" />
       </div>
-      <div className="col-span-1 col-start-4">
+      <div className="col-span-2 md:col-span-1 md:col-start-4">
         <MetricCard title="Median Fee" icon={Icons.gasFees} value="<$0.01" />
       </div>
     </>

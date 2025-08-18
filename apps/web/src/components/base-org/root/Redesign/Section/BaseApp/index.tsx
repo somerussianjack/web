@@ -31,6 +31,7 @@ export function SectionBaseApp() {
             <ParallaxScaleWrapper
               parallaxMultiplier={1.05}
               maxScale={1.1}
+              startingScale={0.8}
               scrollRange={{ start: 0.8, end: 0.2 }}
             >
               <div className="absolute inset-0 w-full h-full">

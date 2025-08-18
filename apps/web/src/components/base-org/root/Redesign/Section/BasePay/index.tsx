@@ -17,7 +17,7 @@ export function SectionBasePay() {
   return (
     <Section content={content}>
       <motion.div
-        className="relative col-span-full h-full max-h-[80svh] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
+        className="relative col-span-full h-full md:max-h-[80svh] md:aspect-auto aspect-[16/12] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
         variants={itemContentVariants}
       >
         {/* <VideoPlayer
@@ -36,7 +36,7 @@ export function SectionBasePay() {
               height={300}
               src="/images/base-pay-slide.png"
               alt="Base Pay"
-              className="h-auto max-w-[300px] overflow-hidden rounded-xl object-contain"
+              className="h-auto max-w-[250px] md:max-w-[300px] overflow-hidden rounded-xl object-contain"
             />
           </div>
         </div>
