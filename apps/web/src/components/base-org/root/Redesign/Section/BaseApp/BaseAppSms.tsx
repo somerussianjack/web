@@ -6,7 +6,7 @@ import { useState } from 'react';
 const emojiAnimationConfig = {
   initial: { opacity: 0, scale: 0.5, rotate: -10 },
   animate: { opacity: 1, scale: 1, rotate: 0 },
-  transition: { type: spring, bounce: 0.3, duration: 0.3 }
+  transition: { ease: [0.39, 0.24, 0.3, 1], duration: 0.3, delay: 0 }
 };
 
 const emojiAnimationConfigWithDelay = {
@@ -29,7 +29,7 @@ export function BaseAppSms() {
           className="flex justify-start items-start w-full"
         >
           <svg
-          className="scale-95 group-hover:scale-100 transition-all duration-300 will-change-transform"
+          className="scale-95 group-hover:scale-100 transition-all duration-200 will-change-transform"
             width="194"
             height="37"
             viewBox="0 0 194 37"
@@ -51,7 +51,7 @@ export function BaseAppSms() {
           className="mt-[4%] flex w-full items-end justify-end"
         >
           <svg
-            className='scale-95 group-hover:scale-100 transition-all duration-300 delay-100 will-change-transform'
+            className='scale-95 group-hover:scale-100 transition-all duration-200 delay-100 will-change-transform'
             width="195"
             height="37"
             viewBox="0 0 195 37"
