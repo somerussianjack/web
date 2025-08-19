@@ -18,7 +18,7 @@ export function LogoHero() {
         muted
         loop
         playsInline
-        src="/videos/intro-loop.webm"
+        src="/videos/output.webm"
         style={{
           display: 'block',
           ...logoMaskStyle,
