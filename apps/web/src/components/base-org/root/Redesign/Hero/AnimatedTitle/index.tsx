@@ -1,5 +1,5 @@
 'use client';
-import { motion, Variants, cubicBezier } from 'motion/react';
+import { motion, Variants, cubicBezier, spring } from 'motion/react';
 import Title from 'apps/web/src/components/base-org/typography/TitleRedesign';
 import { TitleLevel } from 'apps/web/src/components/base-org/typography/TitleRedesign/types';
 
@@ -7,7 +7,7 @@ const easeFn = cubicBezier(0.4, 0, 0.2, 1);
 
 export const itemContentVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeFn } },
+  visible: { opacity: 1, y: 0, transition: { type: spring, bounce: 0.3, duration: 0.6 } },
 };
 
 const containerVariants: Variants = {
