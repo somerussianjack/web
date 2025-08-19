@@ -4,6 +4,7 @@ import { ImageType, Section } from 'apps/web/src/components/base-org/root/Redesi
 import PrefixAsset from './prefix.svg';
 import { Terminal } from './Terminal';
 import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
+import ParallaxScaleWrapper from 'apps/web/src/components/base-org/root/Redesign/Section/BaseApp/ParallaxScaleWrapper';
 // import FaultyTerminal from './FaultyTerminal';
 
 const prefix = PrefixAsset as ImageType;
@@ -25,7 +26,14 @@ export function SectionBaseBuilders() {
             scanlineIntensity={0.0}
             tint="#8F8FFF"
           /> */}
-          <VideoPlayer loop={false} videoSrc="/videos/bg-terminal.mp4" />
+          <ParallaxScaleWrapper
+              className="w-full h-full"
+              disableParallax
+              maxScale={1.1}
+              startingScale={1.0}
+              scrollRange={{ start: 0.99, end: 0.0 }}>
+            <VideoPlayer loop={false} videoSrc="/videos/bg-terminal.mp4" />
+          </ParallaxScaleWrapper>
         </div>
       </div>
     </Section>

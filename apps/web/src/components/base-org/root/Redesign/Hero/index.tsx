@@ -22,7 +22,7 @@ export const motionConfig: any = {
 export function Hero() {
   return (
     <Container className="!lg:mb-0 !mb-0 grid-cols-9 gap-y-12">
-      <div className="col-span-full flex h-[calc(100vh-220px)] md:h-fit flex-col justify-start gap-y-6 md:justify-start">
+      <div className="col-span-full flex h-fit md:h-fit flex-col justify-start gap-y-6 md:justify-start">
         <div className="relative col-span-full pb-0 w-full">
           <LogoHero />
           {/* <AnimatedTitle /> */}
@@ -46,7 +46,7 @@ export function Hero() {
           >
             <div className="w-full">
               <Text variant={TextVariant.Body} className="!text-base-gray-200">
-                Base is a full stack for the onchain economy— empowering builders, creators, and
+                Base is a full stack for the onchain economy — empowering builders, creators, and
                 people everywhere to build apps, grow businesses, create what they love, and earn
                 onchain.
               </Text>

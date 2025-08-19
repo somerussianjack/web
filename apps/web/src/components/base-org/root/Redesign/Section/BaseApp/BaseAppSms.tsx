@@ -1,15 +1,35 @@
-import { motion } from 'motion/react';
+import { motion, spring } from 'motion/react';
 import { itemContentVariants } from '..';
+import { useState } from 'react';
+
+// Reusable animation configurations for the emoji motion divs
+const emojiAnimationConfig = {
+  initial: { opacity: 0, scale: 0.5, rotate: -10 },
+  animate: { opacity: 1, scale: 1, rotate: 0 },
+  transition: { type: spring, bounce: 0.3, duration: 0.3 }
+};
+
+const emojiAnimationConfigWithDelay = {
+  ...emojiAnimationConfig,
+  transition: { ...emojiAnimationConfig.transition, delay: 0.2 }
+};
 
 export function BaseAppSms() {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div className="flex justify-center items-center w-full h-full">
+    <div 
+      className="flex justify-center items-center w-full h-full group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="relative flex h-fit w-[80%] flex-col items-center justify-center text-[100%]">
         <motion.div
           variants={itemContentVariants}
           className="flex justify-start items-start w-full"
         >
           <svg
+          className="scale-95 group-hover:scale-100 transition-all duration-300 will-change-transform"
             width="194"
             height="37"
             viewBox="0 0 194 37"
@@ -31,6 +51,7 @@ export function BaseAppSms() {
           className="mt-[4%] flex w-full items-end justify-end"
         >
           <svg
+            className='scale-95 group-hover:scale-100 transition-all duration-300 delay-100 will-change-transform'
             width="195"
             height="37"
             viewBox="0 0 195 37"
@@ -48,12 +69,20 @@ export function BaseAppSms() {
           </svg>
         </motion.div>
       </div>
-      <div className="absolute right-[20%] top-[10%] rotate-[-10deg]">
-        <span className="text-4xl">👀</span>
-      </div>
-      <div className="absolute right-[10%] top-[20%]">
-        <span className="text-4xl">🔥</span>
-      </div>
+      <motion.div
+        {...emojiAnimationConfig}
+        animate={isHovered ? emojiAnimationConfig.animate : {}}
+        className="absolute right-[10%] top-[24%] rotate-[-10deg]"
+      >
+        <span className="lg:text-[2vw] text-[5vw]">👀</span>
+      </motion.div>
+      <motion.div
+        {...emojiAnimationConfigWithDelay}
+        animate={isHovered ? emojiAnimationConfigWithDelay.animate : {}}
+        className="absolute right-[50%] top-[42%]"
+      >
+        <span className="lg:text-[2vw] text-[5vw]">🔥</span>
+      </motion.div>
     </div>
   );
 }

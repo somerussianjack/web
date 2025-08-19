@@ -82,16 +82,16 @@ export function BaseAppSend() {
 						rounded-full transition-all duration-300 group-hover:right-[90%]"
               >
                 <Image
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-full scale-105"
                   src={usa.src}
                   alt="Avatar"
                   width={usa.width}
                   height={usa.height}
                 />
               </div>
-              <div className="absolute top-full">
-                <p>$130.00</p>
-                <p>130 USDC</p>
+              <div className="absolute top-full flex flex-col gap-1 leading-none pt-2">
+                <p className="text-[4.5vw] lg:text-[2vw] font-medium">$130.00</p>
+                <p className="lg:text-[0.95vw] text-base-gray-200">130 USDC</p>
               </div>
             </div>
           </div>
@@ -112,16 +112,16 @@ export function BaseAppSend() {
 						rounded-full transition-all duration-300 group-hover:right-[90%]"
               >
                 <Image
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-full scale-105"
                   src={hk.src}
                   alt="Avatar"
                   width={hk.width}
                   height={hk.height}
                 />
               </div>
-              <div className="absolute top-full transition-all duration-300 group-hover:translate-x-[30%]">
-                <p>Emma</p>
-                <p>Emmaonchain.base.eth</p>
+              <div className="absolute top-full transition-all duration-300 group-hover:translate-x-[34%] leading-none pt-2 flex flex-col gap-1">
+                <p className="text-[4.5vw] lg:text-[2vw] font-medium">Emma</p>
+                <p className="lg:text-[0.95vw] text-base-gray-200">Emmaonchain.base.eth</p>
               </div>
             </div>
           </div>
