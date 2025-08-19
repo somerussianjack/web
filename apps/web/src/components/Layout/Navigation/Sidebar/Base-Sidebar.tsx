@@ -309,17 +309,7 @@ export function BaseNavigation({ isMobile = false }: { isMobile?: boolean }) {
             <span className="font-sans text-xs text-base-blue">START HERE</span>
           </div>
 
-          <Button
-            type="button"
-            className="w-full"
-            asChild
-            variant={ButtonVariants.Secondary}
-            size={ButtonSizes.Small}
-          >
-            <Link href="https://base.app" className="group" target="_blank">
-              Get Base App
-            </Link>
-          </Button>
+
           <Button
             type="button"
             className="w-full"
@@ -329,6 +319,17 @@ export function BaseNavigation({ isMobile = false }: { isMobile?: boolean }) {
           >
             <Link href="/build" className="group">
               Build on Base
+            </Link>
+          </Button>
+          <Button
+            type="button"
+            className="w-full"
+            asChild
+            variant={ButtonVariants.Blue}
+            size={ButtonSizes.Small}
+          >
+            <Link href="https://base.app" className="group" target="_blank">
+              Get Base App
             </Link>
           </Button>
         </div>

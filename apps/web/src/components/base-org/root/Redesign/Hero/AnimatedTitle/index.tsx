@@ -27,7 +27,7 @@ export function AnimatedTitle() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="row-start-1 row-end-3 mt-8 max-w-[900px]"
+      className="row-start-1 row-end-3 mt-0 max-w-[900px]"
     >
       <Title level={TitleLevel.H1Regular} as="h1">
         {titleLines.map((line) => (

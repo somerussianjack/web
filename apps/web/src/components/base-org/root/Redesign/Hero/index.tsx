@@ -22,10 +22,10 @@ export const motionConfig: any = {
 export function Hero() {
   return (
     <Container className="!lg:mb-0 !mb-0 grid-cols-9 gap-y-12">
-      <div className="col-span-full flex h-[calc(100vh-220px)] md:h-[calc(100vh-80px)] flex-col justify-start gap-y-6 md:justify-between">
+      <div className="col-span-full flex h-[calc(100vh-220px)] md:h-fit flex-col justify-start gap-y-6 md:justify-start">
         <div className="relative col-span-full pb-0 w-full">
           <LogoHero />
-          <AnimatedTitle />
+          {/* <AnimatedTitle /> */}
         </div>
         <div className="col-span-full w-full grid-base">
           {/* <div className="col-span-2 md:col-span-1 md:col-start-3">
@@ -33,6 +33,11 @@ export function Hero() {
               <Title level={TitleLevel.H2Regular}>A full stack for the onchain economy</Title>
             </div>
           </div> */}
+          <div className="col-span-full md:col-span-2 md:col-start-1">
+            <div className="w-full">
+              <AnimatedTitle />
+            </div>
+          </div>
           <motion.div
             initial={motionConfig.initial}
             animate={motionConfig.animate}

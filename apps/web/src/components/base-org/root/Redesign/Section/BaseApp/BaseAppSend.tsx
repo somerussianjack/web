@@ -121,7 +121,7 @@ export function BaseAppSend() {
               </div>
               <div className="absolute top-full transition-all duration-300 group-hover:translate-x-[30%]">
                 <p>Emma</p>
-                <p>emmaonchain.base.eth</p>
+                <p>Emmaonchain.base.eth</p>
               </div>
             </div>
           </div>
@@ -132,7 +132,7 @@ export function BaseAppSend() {
 			group-hover:rounded-tl-none group-hover:rounded-tr-lg"
         >
           <svg
-            className="transition-all duration-300 group-hover:-rotate-180"
+            className="transition-all duration-300 -rotate-90 group-hover:-rotate-[270deg]"
             width="10"
             height="14"
             viewBox="0 0 10 14"
