@@ -6,10 +6,12 @@ import Link from 'apps/web/src/components/Link';
 import Card1 from './card-1.png';
 import Card2 from './card-2.png';
 import Card3 from './card-3.png';
+import Card4 from './card-4.png';
 
 const card1 = Card1 as ImageType;
 const card2 = Card2 as ImageType;
 const card3 = Card3 as ImageType;
+const card4 = Card4 as ImageType;
 
 export function SectionBaseJoin() {
   return (
@@ -19,6 +21,7 @@ export function SectionBaseJoin() {
           <Link
             key={card.index}
             href={card.href}
+            target="_blank"
             className="col-span-2 md:col-span-1 w-full flex-1 overflow-hidden !rounded-[8px]"
           >
             <InteractiveCard
@@ -73,5 +76,14 @@ const cards: CardProps[] = [
     brightness: 1.9,
     contrast: 0.8,
     href: 'https://lu.ma/BaseMeetups',
+  },
+  {
+    index: 4,
+    title: 'Basecamp 2025',
+    description: 'Our annual builder summit. Join us in Stowe, VT.',
+    image: card4.src,
+    brightness: 1.9,
+    contrast: 0.8,
+    href: 'https://basecamp2025.xyz/',
   },
 ];

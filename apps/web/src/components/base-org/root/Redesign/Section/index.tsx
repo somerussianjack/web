@@ -6,7 +6,7 @@ import { TextVariant } from 'apps/web/src/components/base-org/typography/TextRed
 import { TitleLevel } from 'apps/web/src/components/base-org/typography/TitleRedesign/types';
 import AnimatedButton from 'apps/web/src/components/Button/AnimatedButton';
 
-import { motion, Variants, cubicBezier } from 'motion/react';
+import { motion, Variants, cubicBezier, spring } from 'motion/react';
 import Link from 'apps/web/src/components/Link';
 import Container from 'apps/web/src/components/base-org/Container';
 import classNames from 'classnames';
@@ -55,7 +55,7 @@ export const contentVariants: Variants = {
 
 export const itemContentVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: easeFn } },
+  visible: { opacity: 1, y: 0, transition: { type: spring, bounce: 0.3, duration: 0.6 } },
 };
 
 export function Section({ content, children, className, disableWrapperAnimation }: SectionProps) {

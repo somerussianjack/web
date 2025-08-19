@@ -13,6 +13,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // State
   const [hasStartedScrubbing, setHasStartedScrubbing] = useState(false);
@@ -94,30 +95,18 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     context.putImageData(currentFrameCache[clampedIndex], 0, 0);
   }, []);
 
-  const setupResizeObserver = useCallback(() => {
-    const canvasContainer = canvasContainerRef.current;
+  // Debounced window resize handler
+  const handleWindowResize = useCallback(() => {
+    // Clear existing timeout
+    if (resizeTimeoutRef.current) {
+      clearTimeout(resizeTimeoutRef.current);
+    }
 
-    if (!canvasContainer) return;
-
-    resizeObserverRef.current = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        const canvas = canvasRef.current;
-
-        setCanvasWidth(width);
-        setCanvasHeight(height);
-
-        if (canvas) {
-          canvas.width = width;
-          canvas.height = height;
-
-          // Trigger scroll handler to redraw the frame with correct dimensions
-          handleScroll();
-        }
-      }
-    });
-
-    resizeObserverRef.current.observe(canvasContainer);
+    // Set new timeout for debounced execution
+    resizeTimeoutRef.current = setTimeout(() => {
+      // Update canvas position when window is resized
+      handleScroll();
+    }, 150); // 150ms debounce delay
   }, [handleScroll]);
 
   const preloadFrames = useCallback(async () => {
@@ -280,6 +269,40 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     }
   }, [src, preloadFrames]);
 
+  const setupResizeObserver = useCallback(() => {
+    const canvasContainer = canvasContainerRef.current;
+
+    if (!canvasContainer) return;
+
+    resizeObserverRef.current = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        const canvas = canvasRef.current;
+
+        setCanvasWidth(width);
+        setCanvasHeight(height);
+
+        if (canvas) {
+          canvas.width = width;
+          canvas.height = height;
+
+          // Regenerate frame cache with new dimensions if video is loaded
+          if (videoRef.current && videoRef.current.duration > 0) {
+            // Clear existing frame cache and reload with new dimensions
+            setFrameCache([]);
+            setFramesLoaded(false);
+            void preloadFrames();
+          } else {
+            // Just trigger scroll handler if no video loaded yet
+            handleScroll();
+          }
+        }
+      }
+    });
+
+    resizeObserverRef.current.observe(canvasContainer);
+  }, [handleScroll, preloadFrames]);
+
   // Duplicate handleScroll removed - using the one defined above
 
   const setupIntersectionObserver = useCallback(() => {
@@ -335,11 +358,19 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     // Remove scroll listener if it was added
     window.removeEventListener('scroll', handleScroll);
 
+    // Remove window resize listener
+    window.removeEventListener('resize', handleWindowResize);
+
+    // Clear resize timeout
+    if (resizeTimeoutRef.current) {
+      clearTimeout(resizeTimeoutRef.current);
+    }
+
     if (videoRef.current) {
       videoRef.current.removeAttribute('src');
       videoRef.current.load();
     }
-  }, [handleScroll]);
+  }, [handleScroll, handleWindowResize]);
 
   // Handle canvas resizing separately from video initialization
   useEffect(() => {
@@ -378,8 +409,11 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     void initializeVideo();
     setupIntersectionObserver();
 
+    // Add window resize listener
+    window.addEventListener('resize', handleWindowResize, { passive: true });
+
     return cleanup;
-  }, [src, initializeVideo, setupIntersectionObserver, cleanup]);
+  }, [src, initializeVideo, setupIntersectionObserver, cleanup, handleWindowResize]);
 
   return (
     <div ref={canvasContainerRef} className={`relative w-full h-full ${className}`}>
@@ -394,10 +428,10 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
       </canvas>
 
       {!framesLoaded && loadingProgress > 0 && (
-        <div className="flex absolute inset-0 justify-center items-center text-white bg-black bg-opacity-75">
+        <div className="flex absolute inset-0 justify-center items-center text-white bg-base-gray-25 bg-opacity-75">
           <div className="text-center">
             <div className="mb-2">Loading frames...</div>
-            <div className="overflow-hidden w-48 h-2 bg-gray-700 rounded-full">
+            <div className="overflow-hidden w-48 h-2 bg-base-gray-25 rounded-full">
               <div
                 className="h-full bg-blue-500 transition-all duration-300 ease-out"
                 style={{ width: `${loadingProgress * 100}%` }}

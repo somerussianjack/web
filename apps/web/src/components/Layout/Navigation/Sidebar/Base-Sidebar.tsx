@@ -46,7 +46,7 @@ const mobileSubMenuVariants = {
   exit: { opacity: 0, x: 20 },
 };
 
-const transition = { type: 'tween' as const, duration: 0.25, ease: [0.4, 0, 0.2, 1] };
+const transition = { type: 'spring' as const, duration: 0.25, bounce: 0.2 };
 
 export const isLinkActive = ({
   pathname,

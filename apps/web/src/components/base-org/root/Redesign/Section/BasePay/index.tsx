@@ -7,7 +7,6 @@ import {
 } from 'apps/web/src/components/base-org/root/Redesign/Section';
 import PrefixAsset from './prefix.svg';
 import { motion } from 'motion/react';
-// import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
 import Image from 'next/image';
 import VideoCanvas from './VideoCanvas';
 
@@ -20,12 +19,6 @@ export function SectionBasePay() {
         className="relative col-span-full h-full md:max-h-[80svh] md:aspect-auto aspect-[16/12] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
         variants={itemContentVariants}
       >
-        {/* <VideoPlayer
-          style={{ mixBlendMode: 'multiply' }}
-          loop={false}
-          scrollScrub
-          videoSrc="/videos/basepay-shapes.mp4"
-        /> */}
 
         <VideoCanvas className="mix-blend-multiply" src="/videos/basepay-shapes.mp4" />
 
