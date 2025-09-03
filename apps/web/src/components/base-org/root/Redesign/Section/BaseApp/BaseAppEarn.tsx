@@ -42,7 +42,7 @@ export function BaseAppEarn() {
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
-        className="rounded-md bg-base-blue p-2 font-mono text-5xl text-base-white"
+        className="rounded-md bg-base-green p-2 font-mono text-5xl text-base-black"
         initial={{ scale: 1, opacity: 0.8 }}
         animate={{
           scale: isHovered ? 1.1 : 1,
