@@ -13,6 +13,7 @@ import { TextVariant } from 'apps/web/src/components/base-org/typography/TextRed
 import { BaseAppSocial } from './BaseAppSocial';
 import { BaseAppSend } from './BaseAppSend';
 import { BaseAppSms } from './BaseAppSms';
+import { BaseAppEarn } from './BaseAppEarn';
 
 import ImageAsset from './base-app-phone.png';
 import { motion, spring } from 'motion/react';
@@ -107,7 +108,8 @@ export function SectionBaseApp() {
             className="relative aspect-square w-full overflow-hidden rounded-lg bg-base-gray-25"
           >
             <div className="absolute inset-0 h-full w-full">
-              <BaseAppSms />
+              {/* <BaseAppSms /> */}
+              <BaseAppEarn />
             </div>
           </motion.div>
           <div className="block h-fit max-w-[95%] py-3 lg:py-4">
