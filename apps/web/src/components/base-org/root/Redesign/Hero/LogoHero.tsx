@@ -13,7 +13,7 @@ export function LogoHero() {
   return (
     <div className="relative w-full" style={{ aspectRatio: '614.3790893554688 / 200' }}>
       <video
-        className="object-cover w-full h-full"
+        className="h-full w-full object-cover"
         autoPlay
         muted
         loop

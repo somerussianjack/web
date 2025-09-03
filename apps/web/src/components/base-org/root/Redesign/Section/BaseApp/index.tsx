@@ -23,38 +23,40 @@ const img = ImageAsset as ImageType;
 const prefix = PrefixAsset as ImageType;
 
 export function SectionBaseApp() {
-
   const [phoneIsHovered, setPhoneIsHovered] = useState(false);
   const [socialIsHovered, setSocialIsHovered] = useState(false);
   const [smsIsHovered, setSmsIsHovered] = useState(false);
   const [sendIsHovered, setSendIsHovered] = useState(false);
 
   return (
-    <Section content={content} >
+    <Section content={content}>
       <div className="grid-base mb-base col-span-full min-h-[300px] md:mb-20">
         <motion.div
           variants={itemContentVariants}
-          onMouseEnter={() => setPhoneIsHovered(true)} onMouseLeave={() => setPhoneIsHovered(false)}
-          className="col-span-full w-full h-full md:col-span-2 md:row-span-2 flex flex-col relative"
+          onMouseEnter={() => setPhoneIsHovered(true)}
+          onMouseLeave={() => setPhoneIsHovered(false)}
+          className="relative col-span-full flex h-full w-full flex-col md:col-span-2 md:row-span-2"
         >
-          <motion.div 
-          animate={phoneIsHovered ? { backgroundColor: '#F6F6F6' } : { backgroundColor: '#FAFAFA' }}
-          transition={{ type: spring, bounce: 0.3, duration: 0.3 }}
-          
-          className="overflow-hidden relative justify-center items-center w-full h-full rounded-lg aspect-square bg-base-gray-25 md:aspect-auto group">
+          <motion.div
+            animate={
+              phoneIsHovered ? { backgroundColor: '#F6F6F6' } : { backgroundColor: '#FAFAFA' }
+            }
+            transition={{ type: spring, bounce: 0.3, duration: 0.3 }}
+            className="group relative aspect-square h-full w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25 md:aspect-auto"
+          >
             <ParallaxScaleWrapper
-              parallaxMultiplier={1.05}
-              maxScale={1.1}
-              startingScale={1.0}
-              scrollRange={{ start: 0.99, end: 0.0 }}
+              parallaxMultiplier={1.0}
+              maxScale={1.2}
+              startingScale={0.7}
+              scrollRange={{ start: 1, end: -1.0 }}
             >
-              <div className="absolute inset-0 w-full h-full">
+              <div className="absolute inset-0 h-full w-full">
                 <Image
                   src={img.src}
                   alt="Base App"
                   width={img.width}
                   height={img.height}
-                  className="mx-auto w-[90%] translate-y-[-2%]"
+                  className="mx-auto w-[90%] translate-y-[1%]"
                   draggable={false}
                   sizes="(max-width: 768px) 100vw, 450px"
                   quality={99}
@@ -62,58 +64,70 @@ export function SectionBaseApp() {
               </div>
             </ParallaxScaleWrapper>
           </motion.div>
-          <div className="md:absolute top-full left-0 py-3 lg:py-4 h-fit block max-w-[95%]">
+          <div className="left-0 top-full block h-fit max-w-[95%] py-3 md:absolute lg:py-4">
             <Text variant={TextVariant.Body} className="!text-base-gray-200">
-            An everything app that brings together a social network, apps, payments, and finance. One place to earn, trade, and chat with everyone, everywhere.
+              An everything app that brings together a social network, apps, payments, and finance.
+              One place to earn, trade, and chat with everyone, everywhere.
             </Text>
           </div>
         </motion.div>
 
-        <motion.div 
-        onMouseEnter={() => setSocialIsHovered(true)} onMouseLeave={() => setSocialIsHovered(false)}
-        className="col-span-2 md:col-span-1">
-          <motion.div 
-          animate={socialIsHovered ? { backgroundColor: '#F6F6F6' } : { backgroundColor: '#FAFAFA' }}
-          transition={{ type: spring, bounce: 0.3, duration: 0.3 }}
-          className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
-            <div className="absolute inset-0 w-full h-full">
+        <motion.div
+          onMouseEnter={() => setSocialIsHovered(true)}
+          onMouseLeave={() => setSocialIsHovered(false)}
+          className="col-span-2 md:col-span-1"
+        >
+          <motion.div
+            animate={
+              socialIsHovered ? { backgroundColor: '#F6F6F6' } : { backgroundColor: '#FAFAFA' }
+            }
+            transition={{ type: spring, bounce: 0.3, duration: 0.3 }}
+            className="relative aspect-square w-full overflow-hidden rounded-lg bg-base-gray-25"
+          >
+            <div className="absolute inset-0 h-full w-full">
               <BaseAppSocial />
             </div>
           </motion.div>
-          <div className="py-3 lg:py-4 h-fit block max-w-[95%]">
+          <div className="block h-fit max-w-[95%] py-3 lg:py-4">
             <Text variant={TextVariant.Body} className="!text-base-gray-200">
-            Your social network, onchain
+              Your social network, onchain
             </Text>
           </div>
         </motion.div>
-        <motion.div onMouseEnter={() => setSmsIsHovered(true)} onMouseLeave={() => setSmsIsHovered(false)} variants={itemContentVariants} className="col-span-2 md:col-span-1">
-          <motion.div 
-          animate={smsIsHovered ? { backgroundColor: '#F6F6F6' } : { backgroundColor: '#FAFAFA' }}
-          transition={{ type: spring, bounce: 0.3, duration: 0.3 }}
-          className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
-            <div className="absolute inset-0 w-full h-full">
+        <motion.div
+          onMouseEnter={() => setSmsIsHovered(true)}
+          onMouseLeave={() => setSmsIsHovered(false)}
+          variants={itemContentVariants}
+          className="col-span-2 md:col-span-1"
+        >
+          <motion.div
+            animate={smsIsHovered ? { backgroundColor: '#F6F6F6' } : { backgroundColor: '#FAFAFA' }}
+            transition={{ type: spring, bounce: 0.3, duration: 0.3 }}
+            className="relative aspect-square w-full overflow-hidden rounded-lg bg-base-gray-25"
+          >
+            <div className="absolute inset-0 h-full w-full">
               <BaseAppSms />
             </div>
           </motion.div>
-          <div className="py-3 lg:py-4 h-fit block max-w-[95%]">
+          <div className="block h-fit max-w-[95%] py-3 lg:py-4">
             <Text variant={TextVariant.Body} className="!text-base-gray-200">
-            Fully encrypted messages
+              Create and earn
             </Text>
           </div>
         </motion.div>
 
         <motion.div
           variants={itemContentVariants}
-          className="col-span-full md:col-span-2 md:col-start-3 relative"
+          className="relative col-span-full md:col-span-2 md:col-start-3"
         >
-          <div className="overflow-hidden relative w-full rounded-lg aspect-square bg-base-gray-25">
-            <div className="absolute inset-0 w-full h-full">
+          <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-base-gray-25">
+            <div className="absolute inset-0 h-full w-full">
               <BaseAppSend />
             </div>
           </div>
-          <div className="md:absolute top-full left-0 py-3 lg:py-4 h-fit block max-w-[95%]">
+          <div className="left-0 top-full block h-fit max-w-[95%] py-3 md:absolute lg:py-4">
             <Text variant={TextVariant.Body} className="!text-base-gray-200">
-            Send money globally for free
+              Send money globally for free
             </Text>
           </div>
         </motion.div>

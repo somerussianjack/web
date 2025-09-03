@@ -16,11 +16,11 @@ const strokeWidth = 6;
 
 export function BaseAppSend() {
   return (
-    <div className="flex justify-center items-center w-full h-full group">
+    <div className="group flex h-full w-full items-center justify-center">
       <ParallaxScaleWrapper
-        maxScale={1.1}
-        parallaxMultiplier={0.8}
-        disableParallax
+        maxScale={1.0}
+        parallaxMultiplier={0.99}
+        disableScale
         scrollRange={{ start: 0.8, end: 0.2 }}
       >
         <svg
@@ -63,15 +63,15 @@ export function BaseAppSend() {
           />
         </svg>
       </ParallaxScaleWrapper>
-      <div className="flex absolute inset-0 justify-center items-center w-full h-full">
-        <div className="grid grid-cols-2 w-2/3">
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center">
+        <div className="grid w-2/3 grid-cols-2">
           <div className="col-span-1">
             <div
               className="bg-neutral-200 relative aspect-square translate-x-[12%] translate-y-[12%] rounded-lg
 					transition-all duration-300 group-hover:translate-y-[88%]"
             >
               <Image
-                className="object-cover w-full h-full rounded-xl"
+                className="h-full w-full rounded-xl object-cover"
                 src={avatar1.src}
                 alt="Avatar"
                 width={avatar1.width}
@@ -82,16 +82,16 @@ export function BaseAppSend() {
 						rounded-full transition-all duration-300 group-hover:right-[90%]"
               >
                 <Image
-                  className="object-cover w-full h-full scale-105"
+                  className="h-full w-full scale-105 object-cover"
                   src={usa.src}
                   alt="Avatar"
                   width={usa.width}
                   height={usa.height}
                 />
               </div>
-              <div className="absolute top-full flex flex-col gap-1 leading-none pt-2">
-                <p className="text-[4.5vw] lg:text-[2vw] font-medium">$130.00</p>
-                <p className="lg:text-[0.95vw] text-base-gray-200">130 USDC</p>
+              <div className="absolute top-full flex flex-col gap-1 pt-2 leading-none">
+                <p className="text-[4.5vw] font-medium lg:text-[2vw]">$130.00</p>
+                <p className="text-base-gray-200 lg:text-[0.95vw]">130 USDC</p>
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ export function BaseAppSend() {
 					transition-all duration-300 group-hover:translate-y-[-88%]"
             >
               <Image
-                className="object-cover w-full h-full rounded-xl"
+                className="h-full w-full rounded-xl object-cover"
                 src={avatar2.src}
                 alt="Avatar"
                 width={avatar2.width}
@@ -112,16 +112,16 @@ export function BaseAppSend() {
 						rounded-full transition-all duration-300 group-hover:right-[90%]"
               >
                 <Image
-                  className="object-cover w-full h-full scale-105"
+                  className="h-full w-full scale-105 object-cover"
                   src={hk.src}
                   alt="Avatar"
                   width={hk.width}
                   height={hk.height}
                 />
               </div>
-              <div className="absolute top-full transition-all duration-300 group-hover:translate-x-[34%] leading-none pt-2 flex flex-col gap-1">
-                <p className="text-[4.5vw] lg:text-[2vw] font-medium">Emma</p>
-                <p className="lg:text-[0.95vw] text-base-gray-200">Emmaonchain.base.eth</p>
+              <div className="absolute top-full flex flex-col gap-1 pt-2 leading-none transition-all duration-300 group-hover:translate-x-[34%]">
+                <p className="text-[4.5vw] font-medium lg:text-[2vw]">Emma</p>
+                <p className="text-base-gray-200 lg:text-[0.95vw]">Emmaonchain.base.eth</p>
               </div>
             </div>
           </div>
@@ -132,7 +132,7 @@ export function BaseAppSend() {
 			group-hover:rounded-tl-none group-hover:rounded-tr-lg"
         >
           <svg
-            className="transition-all duration-300 -rotate-90 group-hover:-rotate-[270deg]"
+            className="-rotate-90 transition-all duration-300 group-hover:-rotate-[270deg]"
             width="10"
             height="14"
             viewBox="0 0 10 14"

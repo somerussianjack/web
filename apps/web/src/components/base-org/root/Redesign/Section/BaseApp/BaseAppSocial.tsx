@@ -3,26 +3,28 @@ import Image from 'next/image';
 
 import ImageAsset1 from './social-asset-1.png';
 import ImageAssetLike from './social-asset-like.png';
+import ImageAsset2 from './social-asset-2.png';
 
 const img1 = ImageAsset1 as ImageType;
-const img2 = ImageAssetLike as ImageType;
+const imgLike = ImageAssetLike as ImageType;
+const img2 = ImageAsset2 as ImageType;
 
 export function BaseAppSocial() {
   return (
-    <div className="flex justify-center items-center w-full h-full group">
+    <div className="group flex h-full w-full items-center justify-center">
       <div>
         <Image
-          src={img1.src}
+          src={img2.src}
           alt="Base App"
-          width={img1.width}
-          height={img1.height}
+          width={img2.width}
+          height={img2.height}
           className="mx-auto w-[50%] translate-x-[40%] rotate-[10deg] transition-all duration-300 group-hover:translate-x-[50%] group-hover:rotate-[12deg]"
           draggable={false}
           sizes="(max-width: 768px) 100vw, 650px"
           quality={99}
         />
       </div>
-      <div className="flex absolute inset-0 justify-center items-center w-full h-full">
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center">
         <Image
           src={img1.src}
           alt="Base App"
@@ -34,12 +36,12 @@ export function BaseAppSocial() {
           quality={99}
         />
       </div>
-      <div className="flex absolute inset-0 z-20 justify-center items-center w-full h-full">
+      <div className="absolute inset-0 z-20 flex h-full w-full items-center justify-center">
         <Image
-          src={img2.src}
+          src={imgLike.src}
           alt="Base App"
-          width={img2.width}
-          height={img2.height}
+          width={imgLike.width}
+          height={imgLike.height}
           className="mx-auto w-[20%] origin-center translate-x-[-100%] translate-y-[10%] rotate-[-10deg] transition-all duration-300 group-hover:rotate-[0deg] group-hover:scale-150"
           draggable={false}
           sizes="(max-width: 768px) 100vw, 450px"
