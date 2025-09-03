@@ -125,7 +125,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     }
 
     const duration = video.duration;
-    const fps = 34; // Assuming 30fps, adjust based on your video
+    const fps = 60; // Assuming 30fps, adjust based on your video
     const totalFramesCount = Math.floor(duration * fps);
 
     // Limit frames for memory management (max 200 frames for better performance)
@@ -151,81 +151,190 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
 
     console.log(`Starting to preload ${maxFrames} frames from video (duration: ${duration}s)`);
 
+    // Helper function to seek to a specific time with retry logic
+    const seekToTime = async (
+      timePosition: number,
+      frameIndex: number,
+      maxRetries = 3,
+    ): Promise<void> => {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error(`Timeout seeking to frame ${frameIndex} (attempt ${attempt + 1})`));
+            }, 8000); // Increased timeout to 8 seconds per frame
+
+            const cleanup = () => {
+              clearTimeout(timeout);
+              video.removeEventListener('seeked', onSeeked);
+              video.removeEventListener('error', onError);
+            };
+
+            const onSeeked = () => {
+              cleanup();
+              resolve();
+            };
+
+            const onError = () => {
+              cleanup();
+              reject(new Error(`Error seeking to frame ${frameIndex} (attempt ${attempt + 1})`));
+            };
+
+            video.addEventListener('seeked', onSeeked, { once: true });
+            video.addEventListener('error', onError, { once: true });
+
+            // Ensure video is ready before seeking
+            if (video.readyState >= 2) {
+              // HAVE_CURRENT_DATA
+              console.log(
+                `Seeking to frame ${frameIndex} at time ${timePosition}s (readyState: ${video.readyState})`,
+              );
+              video.currentTime = timePosition;
+            } else {
+              // Wait for video to be ready
+              console.log(
+                `Video not ready for frame ${frameIndex}, waiting... (readyState: ${video.readyState})`,
+              );
+              const onCanPlay = () => {
+                video.removeEventListener('canplay', onCanPlay);
+                console.log(`Video ready for frame ${frameIndex}, seeking to ${timePosition}s`);
+                video.currentTime = timePosition;
+              };
+              video.addEventListener('canplay', onCanPlay, { once: true });
+            }
+          });
+
+          // If we get here, seeking was successful
+          return;
+        } catch (error) {
+          console.warn(`Attempt ${attempt + 1} failed for frame ${frameIndex}:`, error);
+
+          if (attempt === maxRetries - 1) {
+            // Last attempt failed, throw the error
+            throw error;
+          }
+
+          // Wait a bit before retrying
+          const retryDelay = 1000 * (attempt + 1);
+          console.log(`Waiting ${retryDelay}ms before retry for frame ${frameIndex}...`);
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        }
+      }
+    };
+
     try {
       for (let i = 0; i < maxFrames; i++) {
         const timePosition = (i / (maxFrames - 1)) * duration;
 
-        // Seek to the frame position
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error(`Timeout seeking to frame ${i}`));
-          }, 5000); // 5 second timeout per frame
+        try {
+          // Seek to the frame position with retry logic
+          await seekToTime(timePosition, i);
 
-          video.onseeked = () => {
-            clearTimeout(timeout);
-            try {
-              // Draw frame to temporary canvas
-              tempContext.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+          // Draw frame to temporary canvas
+          tempContext.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-              // Calculate cover-style positioning (fill entire canvas)
-              const videoAspect = video.videoWidth / video.videoHeight;
-              const canvasAspect = tempCanvas.width / tempCanvas.height;
+          // Calculate cover-style positioning (fill entire canvas)
+          const videoAspect = video.videoWidth / video.videoHeight;
+          const canvasAspect = tempCanvas.width / tempCanvas.height;
 
-              let drawWidth, drawHeight, offsetX, offsetY;
+          let drawWidth, drawHeight, offsetX, offsetY;
 
-              if (videoAspect > canvasAspect) {
-                // Video is wider - scale to height and crop sides
-                drawHeight = tempCanvas.height;
-                drawWidth = drawHeight * videoAspect;
-                offsetX = (tempCanvas.width - drawWidth) / 2;
-                offsetY = 0;
-              } else {
-                // Video is taller - scale to width and crop top/bottom
-                drawWidth = tempCanvas.width;
-                drawHeight = drawWidth / videoAspect;
-                offsetX = 0;
-                offsetY = (tempCanvas.height - drawHeight) / 2;
-              }
+          if (videoAspect > canvasAspect) {
+            // Video is wider - scale to height and crop sides
+            drawHeight = tempCanvas.height;
+            drawWidth = drawHeight * videoAspect;
+            offsetX = (tempCanvas.width - drawWidth) / 2;
+            offsetY = 0;
+          } else {
+            // Video is taller - scale to width and crop top/bottom
+            drawWidth = tempCanvas.width;
+            drawHeight = drawWidth / videoAspect;
+            offsetX = 0;
+            offsetY = (tempCanvas.height - drawHeight) / 2;
+          }
 
-              tempContext.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+          tempContext.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
 
-              // Extract and store frame data
-              const frameData = tempContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-              newFrameCache.push(frameData);
+          // Extract and store frame data
+          const frameData = tempContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+          newFrameCache.push(frameData);
 
-              // Update progress
-              setLoadingProgress((i + 1) / maxFrames);
-
-              resolve();
-            } catch (error) {
-              clearTimeout(timeout);
-              reject(error);
-            }
-          };
-
-          video.onerror = () => {
-            clearTimeout(timeout);
-            reject(new Error(`Error seeking to frame ${i}`));
-          };
-
-          video.currentTime = timePosition;
-        });
+          // Update progress
+          setLoadingProgress((i + 1) / maxFrames);
+        } catch (frameError) {
+          console.warn(`Failed to load frame ${i}, continuing with next frame:`, frameError);
+          // Continue with next frame instead of failing completely
+          continue;
+        }
       }
 
-      setFrameCache(newFrameCache);
-      setFramesLoaded(true);
-      setLoadingProgress(1);
+      // Only mark as loaded if we have at least some frames
+      if (newFrameCache.length > 0) {
+        setFrameCache(newFrameCache);
+        setFramesLoaded(true);
+        setLoadingProgress(1);
 
-      console.log(`Successfully preloaded ${newFrameCache.length} frames`);
+        console.log(`Successfully preloaded ${newFrameCache.length} frames`);
 
-      // Draw the first frame
-      if (newFrameCache.length > 0 && context) {
-        context.putImageData(newFrameCache[0], 0, 0);
+        // Draw the first frame
+        if (newFrameCache.length > 0 && context) {
+          context.putImageData(newFrameCache[0], 0, 0);
+        }
+      } else {
+        throw new Error('No frames were successfully loaded');
       }
     } catch (error) {
       console.error('Error during frame preloading:', error);
       setLoadingProgress(0);
       setFramesLoaded(false);
+
+      // If we have some frames, still use them
+      if (newFrameCache.length > 0) {
+        console.log(`Using ${newFrameCache.length} partially loaded frames`);
+        setFrameCache(newFrameCache);
+        setFramesLoaded(true);
+        setLoadingProgress(newFrameCache.length / maxFrames);
+
+        if (context) {
+          context.putImageData(newFrameCache[0], 0, 0);
+        }
+      } else {
+        // No frames loaded at all, try to show at least the first frame
+        console.log('No frames loaded, attempting to show first frame directly...');
+        try {
+          const video = videoRef.current;
+          if (video && video.readyState >= 2) {
+            // Set to first frame
+            video.currentTime = 0;
+
+            // Wait for seek to complete
+            await new Promise<void>((resolve, reject) => {
+              const timeout = setTimeout(
+                () => reject(new Error('Direct frame seek timeout')),
+                5000,
+              );
+
+              const onSeeked = () => {
+                clearTimeout(timeout);
+                video.removeEventListener('seeked', onSeeked);
+                resolve();
+              };
+
+              video.addEventListener('seeked', onSeeked, { once: true });
+            });
+
+            // Draw the first frame directly
+            if (context) {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              setFramesLoaded(true);
+              setLoadingProgress(1);
+              console.log('Direct frame display successful');
+            }
+          }
+        } catch (directFrameError) {
+          console.error('Direct frame display also failed:', directFrameError);
+        }
+      }
     }
   }, []);
 
@@ -241,31 +350,115 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
       // Create video element
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
-      video.preload = 'metadata';
+      video.preload = 'auto'; // Changed from 'metadata' to 'auto' for better preloading
       video.muted = true;
       video.playsInline = true;
       videoRef.current = video;
 
-      // Set up video loading
+      // Set up video loading with better readiness checks
       await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => {
-          // Set initial frame
-          video.currentTime = 0;
-          resolve();
+        const timeout = setTimeout(() => {
+          reject(new Error('Video loading timeout'));
+        }, 30000); // 30 second timeout for video loading
+
+        const cleanup = () => {
+          clearTimeout(timeout);
+          video.removeEventListener('loadedmetadata', onLoadedMetadata);
+          video.removeEventListener('canplay', onCanPlay);
+          video.removeEventListener('error', onError);
         };
 
-        video.onerror = () => {
+        const onLoadedMetadata = () => {
+          console.log('Video metadata loaded, duration:', video.duration);
+          // Wait a bit more for the video to be fully ready
+          setTimeout(() => {
+            if (video.readyState >= 2) {
+              // HAVE_CURRENT_DATA
+              cleanup();
+              resolve();
+            }
+          }, 500);
+        };
+
+        const onCanPlay = () => {
+          console.log('Video can play, readyState:', video.readyState);
+          if (video.readyState >= 2) {
+            // HAVE_CURRENT_DATA
+            cleanup();
+            resolve();
+          }
+        };
+
+        const onError = () => {
+          cleanup();
           console.error('Error loading video:', src);
           reject(new Error('Failed to load video'));
         };
 
+        video.addEventListener('loadedmetadata', onLoadedMetadata);
+        video.addEventListener('canplay', onCanPlay);
+        video.addEventListener('error', onError);
+
         video.src = src;
       });
 
-      // Start preloading frames after video metadata is loaded
+      // Additional check to ensure video is ready
+      if (video.readyState < 2) {
+        console.log('Waiting for video to be ready...');
+        await new Promise<void>((resolve) => {
+          const checkReady = () => {
+            if (video.readyState >= 2) {
+              resolve();
+            } else {
+              setTimeout(checkReady, 100);
+            }
+          };
+          checkReady();
+        });
+      }
+
+      console.log('Video is ready, starting frame preload...');
+
+      // Start preloading frames after video is fully ready
       await preloadFrames();
     } catch (error) {
       console.error('Failed to initialize video:', error);
+
+      // Fallback: try to show at least the first frame without preloading
+      try {
+        const video = videoRef.current;
+        if (video && video.readyState >= 2) {
+          console.log('Attempting fallback frame display...');
+
+          // Set to first frame
+          video.currentTime = 0;
+
+          // Wait for seek to complete
+          await new Promise<void>((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Fallback seek timeout')), 5000);
+
+            const onSeeked = () => {
+              clearTimeout(timeout);
+              video.removeEventListener('seeked', onSeeked);
+              resolve();
+            };
+
+            video.addEventListener('seeked', onSeeked, { once: true });
+          });
+
+          // Draw the first frame directly
+          const context = contextRef.current;
+          const canvas = canvasRef.current;
+          if (context && canvas) {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            setFramesLoaded(true);
+            setLoadingProgress(1);
+            console.log('Fallback frame display successful');
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback frame display also failed:', fallbackError);
+      }
     }
   }, [src, preloadFrames]);
 
@@ -406,7 +599,32 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
 
     if (!canvas || !canvasContainer || !src) return;
 
-    void initializeVideo();
+    let retryCount = 0;
+    const maxRetries = 2;
+
+    const attemptInitialization = async () => {
+      try {
+        await initializeVideo();
+      } catch (error) {
+        console.error(`Video initialization attempt ${retryCount + 1} failed:`, error);
+
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(
+            `Retrying video initialization (attempt ${retryCount + 1}/${maxRetries + 1})...`,
+          );
+
+          // Wait a bit before retrying
+          setTimeout(() => {
+            void attemptInitialization();
+          }, 2000 * retryCount); // Exponential backoff
+        } else {
+          console.error('All video initialization attempts failed');
+        }
+      }
+    };
+
+    void attemptInitialization();
     setupIntersectionObserver();
 
     // Add window resize listener
@@ -416,22 +634,22 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
   }, [src, initializeVideo, setupIntersectionObserver, cleanup, handleWindowResize]);
 
   return (
-    <div ref={canvasContainerRef} className={`relative w-full h-full ${className}`}>
+    <div ref={canvasContainerRef} className={`relative h-full w-full ${className}`}>
       <canvas
         ref={canvasRef}
         width={canvasWidth}
         height={canvasHeight}
-        className="block object-cover w-full h-full"
+        className="block h-full w-full object-cover"
         style={{ imageRendering: 'auto' }}
       >
         Your browser does not support the canvas element.
       </canvas>
 
       {!framesLoaded && loadingProgress > 0 && (
-        <div className="flex absolute inset-0 justify-center items-center text-white bg-base-gray-25 bg-opacity-75">
+        <div className="absolute inset-0 flex items-center justify-center bg-base-gray-25 bg-opacity-75 text-base-black">
           <div className="text-center">
             <div className="mb-2">Loading frames...</div>
-            <div className="overflow-hidden w-48 h-2 bg-base-gray-25 rounded-full">
+            <div className="h-2 w-48 overflow-hidden rounded-full bg-base-gray-150">
               <div
                 className="h-full bg-blue-500 transition-all duration-300 ease-out"
                 style={{ width: `${loadingProgress * 100}%` }}

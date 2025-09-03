@@ -16,20 +16,19 @@ export function SectionBasePay() {
   return (
     <Section content={content}>
       <motion.div
-        className="relative col-span-full h-full md:max-h-[80svh] md:aspect-auto aspect-[16/12] w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25"
+        className="relative col-span-full aspect-[16/12] h-full w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25 md:aspect-auto md:max-h-[80svh]"
         variants={itemContentVariants}
       >
-
         <VideoCanvas className="mix-blend-multiply" src="/videos/basepay-shapes.mp4" />
 
-        <div className="flex absolute inset-0 justify-center items-center w-full h-full">
-          <div className="relative p-6 h-fit w-fit">
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center">
+          <div className="relative h-fit w-fit p-6">
             <Image
               width={300}
               height={300}
               src="/images/base-pay-slide.png"
               alt="Base Pay"
-              className="h-auto max-w-[250px] md:max-w-[300px] overflow-hidden rounded-xl object-contain"
+              className="h-auto max-w-[250px] overflow-hidden rounded-xl object-contain md:max-w-[300px]"
             />
           </div>
         </div>
