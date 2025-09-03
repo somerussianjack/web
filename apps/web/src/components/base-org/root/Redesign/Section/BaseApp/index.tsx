@@ -45,8 +45,9 @@ export function SectionBaseApp() {
             className="group relative aspect-square h-full w-full items-center justify-center overflow-hidden rounded-lg bg-base-gray-25 md:aspect-auto"
           >
             <ParallaxScaleWrapper
-              parallaxMultiplier={1.0}
-              maxScale={1.2}
+              parallaxMultiplier={1.1}
+              maxScale={1.1}
+              disableScale
               startingScale={0.7}
               scrollRange={{ start: 1, end: -1.0 }}
             >
@@ -56,7 +57,7 @@ export function SectionBaseApp() {
                   alt="Base App"
                   width={img.width}
                   height={img.height}
-                  className="mx-auto w-[90%] translate-y-[1%]"
+                  className="mx-auto w-[90%] translate-y-[10%]"
                   draggable={false}
                   sizes="(max-width: 768px) 100vw, 450px"
                   quality={99}
