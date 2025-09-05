@@ -36,19 +36,19 @@ export function GasPriceDropdown() {
   });
 
   return (
-    <div className="relative group">
+    <div className="group relative">
       <div className="flex cursor-pointer flex-row items-center gap-2 rounded-lg bg-[#FAFAFA] px-3 py-1 transition-all">
         <span className="animate-pulse text-palette-positive">
           <Icon name="blueCircle" color="currentColor" height="0.5rem" width="0.5rem" />
         </span>
-        <div className="flex gap-1 items-center">
-          <span className="font-bold text-black font-doto">
+        <div className="flex items-center gap-1">
+          <span className="font-doto font-bold text-black">
             {baseGasPriceInWei ? convertWeiToMwei(baseGasPriceInWei) : <>&mdash;</>}
           </span>
           <span className="text-sm text-base-gray-200">Mwei</span>
         </div>
       </div>
-      <div className="hidden absolute right-0 top-full pt-2 lg:group-hover:inline-block">
+      <div className="absolute right-0 top-full hidden pt-2 lg:group-hover:inline-block">
         <Card
           innerClassName="p-3 border border-base-black bg-white hover:bg-white font-sans text-[0.875rem]"
           radius={9}
@@ -56,8 +56,8 @@ export function GasPriceDropdown() {
           <ul className="flex flex-col gap-2 whitespace-nowrap">
             <li className="flex gap-2">
               <strong className="font-normal">{base.name}</strong>
-              <div className="flex gap-1 items-center">
-                <span className="font-bold font-doto">
+              <div className="flex items-center gap-1">
+                <span className="font-doto font-bold">
                   {baseGasPriceInWei ? convertWeiToMwei(baseGasPriceInWei) : <>&mdash;</>}
                 </span>
                 <span className="text-base-gray-200">Mwei</span>
@@ -65,12 +65,15 @@ export function GasPriceDropdown() {
             </li>
             <li className="flex gap-2">
               <strong className="font-normal">{mainnet.name}</strong>
-              <div className="flex gap-1 items-center">
-                <span className="font-bold font-doto">
+              <div className="flex items-center gap-1">
+                <span className="font-doto font-bold">
                   {mainnetGasPriceInWei ? convertWeiToMwei(mainnetGasPriceInWei) : <>&mdash;</>}
                 </span>
                 <span className="text-base-gray-200">Mwei</span>
               </div>
+            </li>
+            <li>
+              <p className="text-sm text-base-gray-200">Information here</p>
             </li>
           </ul>
         </Card>
@@ -100,8 +103,8 @@ export function GasPriceDropdownItem() {
       <span className="animate-pulse text-palette-positive">
         <Icon name="blueCircle" color="currentColor" height="0.5rem" width="0.5rem" />
       </span>
-      <div className="flex gap-1 items-center">
-        <span className="font-bold text-black font-doto">
+      <div className="flex items-center gap-1">
+        <span className="font-doto font-bold text-black">
           {baseGasPriceInWei ? convertWeiToMwei(baseGasPriceInWei) : <>&mdash;</>}
         </span>
         <span className="text-sm text-base-gray-200">Mwei</span>

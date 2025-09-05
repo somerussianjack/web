@@ -43,67 +43,109 @@ export function BaseAppEarn() {
 
   return (
     <div
-      className="group flex h-full w-full items-end justify-end p-4"
+      className="group relative flex h-full w-full items-center justify-center p-4"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* <motion.div
-        className="rounded-md bg-base-green p-2 font-mono text-5xl text-base-black"
-        initial={{ scale: 1, opacity: 0.8 }}
-        animate={{
-          scale: isHovered ? 1.1 : 1,
-          opacity: isHovered ? 1 : 0.8,
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 300,
-          damping: 20,
-        }}
-      >
-        ${count.toLocaleString()}
-      </motion.div> */}
-
-      <div className="flex scale-95 flex-col gap-4 rounded-md bg-white p-2 text-lg transition-all duration-300 group-hover:scale-100">
-        <div className="aspect-square w-full overflow-hidden rounded-lg">
-          <Image
-            src={img1.src}
-            alt="Base App"
-            width={img1.width}
-            height={img1.height}
-            className="h-full w-full object-cover"
+      <div className="absolute flex h-full w-full items-center justify-center">
+        <svg
+          width="241"
+          height="233"
+          className="h-full w-full"
+          viewBox="-20 -20 281 273"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <motion.circle
+            cx="227"
+            cy="14"
+            r="14"
+            fill="#66C800"
+            fillOpacity="0.2"
+            animate={{
+              scale: isHovered ? [1, 1.5, 1] : 1,
+              opacity: isHovered ? 0.4 : 0.0,
+            }}
+            transition={{
+              scale: {
+                duration: 2,
+                repeat: isHovered ? Infinity : 0,
+                ease: 'easeInOut',
+              },
+              opacity: {
+                delay: isHovered ? 0.9 : 0,
+                duration: 0.5,
+                ease: 'easeOut',
+              },
+            }}
           />
-        </div>
+          <motion.path
+            d="M1.75 231.25L12.75 190.25H32.75L43.25 158.25L62.25 136.25H85.25L115.75 87.25L149.25 80.75L227.25 13.75"
+            stroke="#66C800"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="600"
+            animate={{
+              strokeDashoffset: isHovered ? 0 : 700,
+              filter: isHovered ? 'drop-shadow(0 0 8px #66C800)' : 'drop-shadow(0 0 0px #66C80000)',
+            }}
+            transition={{
+              strokeDashoffset: {
+                duration: 2.5,
+                ease: 'easeOut',
+              },
+              filter: {
+                duration: 0.3,
+                ease: 'easeOut',
+              },
+            }}
+          />
+          <motion.circle
+            cx="227"
+            cy="14"
+            r="5"
+            fill="#66C800"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{
+              scale: isHovered ? [1, 1, 1.2, 1] : 0,
+              opacity: isHovered ? 1 : 0,
+              filter: isHovered ? 'drop-shadow(0 0 6px #66C800)' : 'drop-shadow(0 0 0px #66C80000)',
+            }}
+            transition={{
+              scale: {
+                duration: 0.6,
+                delay: isHovered ? 0.9 : 0, // Appears after line finishes (2.5s)
+                times: [0, 0.3, 0.7, 1], // Quick scale up, then pulse
+                repeat: isHovered ? Infinity : 0,
+                repeatDelay: 0.9, // Pause between pulses
+                ease: 'easeInOut',
+              },
+              opacity: {
+                duration: 0.3,
+                delay: isHovered ? 0.5 : 0,
+                ease: 'easeOut',
+              },
+              filter: {
+                duration: 0.3,
+                delay: isHovered ? 2.5 : 0,
+                ease: 'easeOut',
+              },
+            }}
+          />
+        </svg>
+      </div>
+
+      <div
+        style={{ backdropFilter: 'blur(10px)' }}
+        className="flex scale-95 flex-col gap-4 rounded-md bg-base-gray-50/50 p-2 text-lg transition-all duration-300 group-hover:scale-100"
+      >
         <div className="flex gap-3 text-base-gray-200">
-          <div className="flex items-center gap-2">
-            {/* comments */}
-            <svg
-              width="20"
-              height="22"
-              viewBox="0 0 20 22"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M3.68288 15.111L2.82843 18.2998L6.44754 17.3301L7.06243 17.5735C7.97053 17.9329 8.96209 18.1313 10.0049 18.1313C14.4231 18.1313 18.0049 14.5496 18.0049 10.1313C18.0049 5.71307 14.4231 2.13135 10.0049 2.13135C5.58658 2.13135 2.00485 5.71307 2.00485 10.1313C2.00485 11.693 2.45028 13.1444 3.22016 14.3727L3.68288 15.111ZM0 21.1283L1.52553 15.4349C0.56195 13.8976 0.00485241 12.0795 0.00485241 10.1313C0.00485241 4.6085 4.48201 0.131348 10.0049 0.131348C15.5277 0.131348 20.0049 4.6085 20.0049 10.1313C20.0049 15.6542 15.5277 20.1314 10.0049 20.1314C8.70599 20.1314 7.46496 19.8837 6.32641 19.4331L0 21.1283Z"
-                fill="#717886"
-              />
-            </svg>
-            <span className="w-6">
-              <AnimatedCount
-                initialCount={2}
-                targetCount={10}
-                isActive={isHovered}
-                prefix=""
-                suffix=""
-              />
-            </span>
-          </div>
           <div className="flex items-center gap-2">
             {/* repost */}
             <svg
               style={{
                 filter: isHovered
-                  ? 'drop-shadow(0 0 8px #008c38)'
+                  ? 'drop-shadow(0 0 0px #008c38)'
                   : 'drop-shadow(0 0 0px #008c3800)',
               }}
               className="transition-all duration-300 group-hover:rotate-[540deg]"
@@ -137,7 +179,7 @@ export function BaseAppEarn() {
             <svg
               style={{
                 filter: isHovered
-                  ? 'drop-shadow(0 0 8px #FF2728)'
+                  ? 'drop-shadow(0 0 0px #FF2728)'
                   : 'drop-shadow(0 0 0px #FF272800)',
               }}
               className="transition-all duration-300 group-hover:scale-110"
@@ -174,7 +216,7 @@ export function BaseAppEarn() {
             <svg
               style={{
                 filter: isHovered
-                  ? 'drop-shadow(0 0 8px #005eff)'
+                  ? 'drop-shadow(0 0 0px #005eff)'
                   : 'drop-shadow(0 0 0px #005eff00)',
               }}
               width="22"
@@ -189,31 +231,15 @@ export function BaseAppEarn() {
                 d="M13.9942 3.62856L8.93633 17.1163L7.0694 17.1312L4.17198 9.76519H0V7.76519L5.53444 7.76514L7.97772 13.9766L13.0637 0.414062L14.9377 0.417837L17.6593 7.76518H22V9.76519L16.2673 9.76519L13.9942 3.62856Z"
               />
             </svg>
-            <span className="w-6">
+            <span className="">
               <AnimatedCount
-                initialCount={20}
-                targetCount={106}
+                initialCount={100}
+                targetCount={20}
                 isActive={isHovered}
-                prefix=""
-                suffix=""
+                prefix="$"
+                suffix={isHovered ? 'k' : ''}
               />
             </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {/* share */}
-            <svg
-              width="20"
-              height="21"
-              viewBox="0 0 20 21"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5 7.82838L9 3.82838L9 16.4142H11L11 3.82847L15 7.82847V5.00005L9.99995 0L5 4.99995V7.82838Z"
-                fill="#717886"
-              />
-              <path d="M2 13.4142V18.4142H18V13.4142H20V20.4142H0V13.4142H2Z" fill="#717886" />
-            </svg>
           </div>
         </div>
       </div>
@@ -274,11 +300,8 @@ function AnimatedCount({
   }, [isActive, targetCount, duration]);
 
   return (
-    <span className={className}>
-      {/* {prefix}
-      {count.toLocaleString()}
-      {suffix} */}
-      <NumberFlow willChange value={count} locales="en-US" />
+    <span>
+      <NumberFlow prefix={prefix} suffix={suffix} willChange value={count} locales="en-US" />
     </span>
   );
 }

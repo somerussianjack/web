@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 type VideoCanvasProps = {
   src?: string;
   className?: string;
+  placeholderSrc?: string; // Optional placeholder image to show while loading
 };
 
-function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
+function VideoCanvas({ src = '', className = '', placeholderSrc }: VideoCanvasProps) {
   // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -14,6 +15,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const videoInitializedRef = useRef(false); // Track if video is already initialized
 
   // State
   const [hasStartedScrubbing, setHasStartedScrubbing] = useState(false);
@@ -22,6 +24,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
   const [frameCache, setFrameCache] = useState<ImageData[]>([]);
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [canvasHeight, setCanvasHeight] = useState(600);
+  const [placeholderLoaded, setPlaceholderLoaded] = useState(false);
 
   // Refs for values that need to be accessed in stable callbacks
   const scrollProgressRef = useRef(0);
@@ -42,7 +45,31 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     hasStartedScrubbingRef.current = hasStartedScrubbing;
   }, [hasStartedScrubbing]);
 
-  // Removed setupCanvasSize as it's now inline in useEffect
+  // Load placeholder image immediately
+  const loadPlaceholder = useCallback(async () => {
+    if (!placeholderSrc || !canvasRef.current || !contextRef.current) return;
+
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Failed to load placeholder image'));
+        img.src = placeholderSrc;
+      });
+
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+
+      // Draw placeholder image to canvas
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      setPlaceholderLoaded(true);
+      console.log('Placeholder image loaded and displayed');
+    } catch (error) {
+      console.warn('Failed to load placeholder image:', error);
+    }
+  }, [placeholderSrc]);
 
   const handleScroll = useCallback(() => {
     const canvas = canvasRef.current;
@@ -91,8 +118,29 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     const frameIndex = Math.floor(progress * (currentFrameCache.length - 1));
     const clampedIndex = Math.max(0, Math.min(currentFrameCache.length - 1, frameIndex));
 
-    // Draw the frame instantly from cache
-    context.putImageData(currentFrameCache[clampedIndex], 0, 0);
+    // Find the nearest available frame (handle sparse cache)
+    let frameToDraw = currentFrameCache[clampedIndex];
+    if (!frameToDraw) {
+      // Find the nearest available frame
+      for (let offset = 1; offset < currentFrameCache.length; offset++) {
+        const lowerIndex = clampedIndex - offset;
+        const upperIndex = clampedIndex + offset;
+
+        if (lowerIndex >= 0 && currentFrameCache[lowerIndex]) {
+          frameToDraw = currentFrameCache[lowerIndex];
+          break;
+        }
+        if (upperIndex < currentFrameCache.length && currentFrameCache[upperIndex]) {
+          frameToDraw = currentFrameCache[upperIndex];
+          break;
+        }
+      }
+    }
+
+    // Draw the frame instantly from cache if available
+    if (frameToDraw) {
+      context.putImageData(frameToDraw, 0, 0);
+    }
   }, []);
 
   // Debounced window resize handler
@@ -128,8 +176,8 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     const fps = 60; // Assuming 30fps, adjust based on your video
     const totalFramesCount = Math.floor(duration * fps);
 
-    // Limit frames for memory management (max 200 frames for better performance)
-    const maxFrames = Math.min(totalFramesCount, 200);
+    // Limit frames for memory management (max 80 frames for faster loading)
+    const maxFrames = Math.min(totalFramesCount, 80);
 
     const newFrameCache: ImageData[] = [];
     setLoadingProgress(0);
@@ -162,7 +210,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
           await new Promise<void>((resolve, reject) => {
             const timeout = setTimeout(() => {
               reject(new Error(`Timeout seeking to frame ${frameIndex} (attempt ${attempt + 1})`));
-            }, 8000); // Increased timeout to 8 seconds per frame
+            }, 3000); // Reduced timeout to 3 seconds per frame for faster loading
 
             const cleanup = () => {
               clearTimeout(timeout);
@@ -222,8 +270,72 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
       }
     };
 
+    // First, load key frames (0%, 25%, 50%, 75%, 100%) for immediate visual feedback
+    const keyFramePositions = [0, 0.25, 0.5, 0.75, 1];
+    const keyFrameIndices = keyFramePositions.map((pos) => Math.floor(pos * (maxFrames - 1)));
+
+    console.log('Loading key frames first for immediate feedback...');
+
+    // Load key frames first
+    for (const frameIndex of keyFrameIndices) {
+      const timePosition = (frameIndex / (maxFrames - 1)) * duration;
+
+      try {
+        await seekToTime(timePosition, frameIndex);
+
+        // Draw frame to temporary canvas
+        tempContext.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Calculate cover-style positioning (fill entire canvas)
+        const videoAspect = video.videoWidth / video.videoHeight;
+        const canvasAspect = tempCanvas.width / tempCanvas.height;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (videoAspect > canvasAspect) {
+          // Video is wider - scale to height and crop sides
+          drawHeight = tempCanvas.height;
+          drawWidth = drawHeight * videoAspect;
+          offsetX = (tempCanvas.width - drawWidth) / 2;
+          offsetY = 0;
+        } else {
+          // Video is taller - scale to width and crop top/bottom
+          drawWidth = tempCanvas.width;
+          drawHeight = drawWidth / videoAspect;
+          offsetX = 0;
+          offsetY = (tempCanvas.height - drawHeight) / 2;
+        }
+
+        tempContext.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+
+        // Extract and store frame data
+        const frameData = tempContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        newFrameCache[frameIndex] = frameData;
+
+        // Show first frame immediately
+        if (frameIndex === 0) {
+          context.putImageData(frameData, 0, 0);
+          setFramesLoaded(true);
+          console.log('First frame displayed immediately');
+        }
+      } catch (frameError) {
+        console.warn(`Failed to load key frame ${frameIndex}:`, frameError);
+      }
+    }
+
+    // Update progress after key frames
+    setLoadingProgress(keyFrameIndices.length / maxFrames);
+
+    // Now load remaining frames in background
+    console.log('Loading remaining frames in background...');
+
     try {
       for (let i = 0; i < maxFrames; i++) {
+        // Skip key frames that are already loaded
+        if (keyFrameIndices.includes(i)) {
+          continue;
+        }
+
         const timePosition = (i / (maxFrames - 1)) * duration;
 
         try {
@@ -257,7 +369,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
 
           // Extract and store frame data
           const frameData = tempContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-          newFrameCache.push(frameData);
+          newFrameCache[i] = frameData;
 
           // Update progress
           setLoadingProgress((i + 1) / maxFrames);
@@ -268,16 +380,19 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
         }
       }
 
+      // Filter out undefined frames and create a dense array
+      const validFrames = newFrameCache.filter((frame) => frame !== undefined);
+
       // Only mark as loaded if we have at least some frames
-      if (newFrameCache.length > 0) {
+      if (validFrames.length > 0) {
         setFrameCache(newFrameCache);
         setFramesLoaded(true);
         setLoadingProgress(1);
 
-        console.log(`Successfully preloaded ${newFrameCache.length} frames`);
+        console.log(`Successfully preloaded ${validFrames.length} frames`);
 
-        // Draw the first frame
-        if (newFrameCache.length > 0 && context) {
+        // Draw the first frame if available
+        if (newFrameCache[0] && context) {
           context.putImageData(newFrameCache[0], 0, 0);
         }
       } else {
@@ -343,19 +458,28 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
 
     if (!canvas || !src) return;
 
+    // Check if video is already initialized
+    if (videoInitializedRef.current && videoRef.current && videoRef.current.duration > 0) {
+      console.log('Video already initialized, skipping re-initialization');
+      return;
+    }
+
     try {
       // Get canvas context
       contextRef.current = canvas.getContext('2d');
 
-      // Create video element
-      const video = document.createElement('video');
-      video.crossOrigin = 'anonymous';
-      video.preload = 'auto'; // Changed from 'metadata' to 'auto' for better preloading
-      video.muted = true;
-      video.playsInline = true;
-      videoRef.current = video;
+      // Create video element only if not already created
+      if (!videoRef.current) {
+        const video = document.createElement('video');
+        video.crossOrigin = 'anonymous';
+        video.preload = 'metadata'; // Use metadata to reduce initial loading time
+        video.muted = true;
+        video.playsInline = true;
+        videoRef.current = video;
+      }
 
       // Set up video loading with better readiness checks
+      const video = videoRef.current;
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
           reject(new Error('Video loading timeout'));
@@ -399,7 +523,14 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
         video.addEventListener('canplay', onCanPlay);
         video.addEventListener('error', onError);
 
-        video.src = src;
+        // Only set src if it's different from current src
+        if (video.src !== src) {
+          video.src = src;
+        } else if (video.readyState >= 2) {
+          // Video is already loaded, resolve immediately
+          cleanup();
+          resolve();
+        }
       });
 
       // Additional check to ensure video is ready
@@ -418,6 +549,9 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
       }
 
       console.log('Video is ready, starting frame preload...');
+
+      // Mark video as initialized
+      videoInitializedRef.current = true;
 
       // Start preloading frames after video is fully ready
       await preloadFrames();
@@ -480,7 +614,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
           canvas.height = height;
 
           // Regenerate frame cache with new dimensions if video is loaded
-          if (videoRef.current && videoRef.current.duration > 0) {
+          if (videoRef.current && videoRef.current.duration > 0 && videoInitializedRef.current) {
             // Clear existing frame cache and reload with new dimensions
             setFrameCache([]);
             setFramesLoaded(false);
@@ -582,6 +716,14 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
     canvas.width = width;
     canvas.height = height;
 
+    // Get canvas context
+    contextRef.current = canvas.getContext('2d');
+
+    // Load placeholder image immediately if available
+    if (placeholderSrc) {
+      void loadPlaceholder();
+    }
+
     // Setup resize observer
     setupResizeObserver();
 
@@ -590,7 +732,7 @@ function VideoCanvas({ src = '', className = '' }: VideoCanvasProps) {
         resizeObserverRef.current.disconnect();
       }
     };
-  }, [setupResizeObserver]); // Include setupResizeObserver dependency
+  }, [setupResizeObserver, loadPlaceholder, placeholderSrc]); // Include dependencies
 
   // Component lifecycle - video initialization
   useEffect(() => {
