@@ -136,8 +136,8 @@ export function BaseAppEarn() {
       </div>
 
       <div
-        style={{ backdropFilter: 'blur(10px)' }}
-        className="flex scale-95 flex-col gap-4 rounded-md bg-base-gray-50/50 p-2 text-lg transition-all duration-300 group-hover:scale-100"
+        style={{ backdropFilter: 'blur(6px)' }}
+        className="flex scale-95 flex-col gap-4 rounded-md bg-white/60 p-2 text-lg transition-all duration-300 group-hover:scale-100"
       >
         <div className="flex gap-3 text-base-gray-200">
           <div className="flex items-center gap-2">

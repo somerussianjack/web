@@ -10,6 +10,17 @@ export function LogoHero() {
     maskPosition: 'center',
   } as React.CSSProperties;
 
+  const videos = [
+    {
+      src: '/videos/output.webm',
+      tag: 'Good Version',
+    },
+    {
+      src: '/videos/intro-loop-updated.webm',
+      tag: 'Bad Version',
+    },
+  ];
+
   return (
     <div className="relative w-full" style={{ aspectRatio: '614.3790893554688 / 200' }}>
       <video
@@ -18,7 +29,7 @@ export function LogoHero() {
         muted
         loop
         playsInline
-        src="/videos/output.webm"
+        src={videos[0].src}
         style={{
           display: 'block',
           ...logoMaskStyle,
