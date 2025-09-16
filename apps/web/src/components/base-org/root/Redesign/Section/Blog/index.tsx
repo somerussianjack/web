@@ -56,17 +56,9 @@ function BlogCarousel() {
   );
 }
 
-type BlogCardProps = {
-  title: string;
-  subtitle: string;
-  href: string;
-  backgroundImage: string;
-  className?: string;
-};
-
 function BlogCardSlideNumber({ slideNumber }: { slideNumber: number }) {
   return (
-    <div className="hidden absolute left-0 -top-12 justify-center items-center w-12 h-12 rounded-tr-md bg-base-gray-25 xl:flex">
+    <div className="absolute -top-12 left-0 hidden h-12 w-12 items-center justify-center rounded-tr-md bg-base-gray-25 xl:flex">
       {/* slide number on the top left */}
       <motion.span
         className={classNames(variantStyles['body-mono'], 'text-base-black')}
@@ -83,11 +75,13 @@ function BlogCardContent({
   subtitle,
   slideNumber,
   animationKey,
+  carouselControls,
 }: {
   title: string;
   subtitle: string;
   slideNumber: number;
   animationKey: number;
+  carouselControls?: React.ReactNode;
 }) {
   return (
     <div className="relative flex flex-[3] md:flex-none">
@@ -128,7 +122,8 @@ function BlogCardContent({
                 >
                   <Text variant={TextVariant.Body}>{subtitle}</Text>
                 </motion.div>
-              </div>
+              </motion.div>
+              {carouselControls}
             </div>
           </div>
         </motion.div>
@@ -136,6 +131,15 @@ function BlogCardContent({
     </div>
   );
 }
+
+type BlogCardProps = {
+  title: string;
+  subtitle: string;
+  href: string;
+  backgroundImage: string;
+  className?: string;
+  carouselControls?: React.ReactNode;
+};
 
 function BlogCard({
   title,
@@ -147,6 +151,7 @@ function BlogCard({
   animationKey,
   brightness,
   contrast,
+  carouselControls,
 }: BlogCardProps & {
   slideNumber: number;
   animationKey: number;
@@ -157,7 +162,7 @@ function BlogCard({
     <Link
       href={href}
       target={href.startsWith('https') ? '_blank' : '_self'}
-      className={classNames('flex overflow-hidden relative flex-col w-full h-full', className)}
+      className={classNames('relative flex h-full w-full flex-col overflow-hidden', className)}
     >
       <BlogCardContent
         title={title}
