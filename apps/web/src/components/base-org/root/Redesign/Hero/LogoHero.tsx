@@ -23,6 +23,10 @@ export function LogoHero() {
       src: '/videos/sept15v2.webm',
       tag: 'Updated',
     },
+    {
+      src: '/videos/september16small.webm',
+      tag: 'Small',
+    },
   ];
 
   return (
@@ -33,7 +37,7 @@ export function LogoHero() {
         muted
         loop
         playsInline
-        src={videos[2].src}
+        src={videos[3].src}
         style={{
           display: 'block',
           ...logoMaskStyle,

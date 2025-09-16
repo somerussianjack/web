@@ -133,7 +133,7 @@ export default function SlideButton({
       onMouseMove={handleMouseMove}
       onMouseLeave={endDrag}
       className={clsx(
-        'group relative flex h-[2.5rem] w-full items-center gap-2 overflow-hidden rounded-md bg-base-gray-50 p-0 text-white',
+        'group relative flex h-[2.5rem] w-full select-none items-center gap-2 overflow-hidden rounded-md bg-base-gray-50 p-0 text-white',
         className,
         animatedProgress >= 0.9 ? 'pointer-events-none' : '',
       )}
@@ -143,7 +143,7 @@ export default function SlideButton({
         className="absolute right-[calc(100%-4px)] top-0 z-20 flex h-full w-[calc(100%+4px)] items-end justify-end transition-colors duration-200"
         style={{
           transform: `translateX(${revealTranslateX}px)`,
-          backgroundColor: isFinished ? '#16a34a' : '#0000ff',
+          backgroundColor: isFinished ? '#66C800' : '#0000ff',
         }}
       >
         {/* Loader + text container, width scales with progress */}
@@ -224,11 +224,11 @@ export default function SlideButton({
           style={{ width: `${revealBarWidth}px` }}
           className="z-30 flex h-full w-full gap-0 overflow-hidden"
         >
-          <div className={clsx('h-full w-full', isFinished ? 'bg-green-500' : 'bg-blue-500')} />
-          <div className="h-full w-full bg-[#00FF00]" />
-          <div className="h-full w-full bg-[#FFFF00]" />
-          <div className="h-full w-full bg-[#FFA500]" />
-          <div className="h-full w-full bg-[#FF0000]" />
+          <div className={clsx('h-full w-full bg-[#3C8AFF]')} />
+          <div className="h-full w-full bg-[#77EA23]" />
+          <div className="h-full w-full bg-[#FFD12F]" />
+          <div className="h-full w-full bg-[#FFA306]" />
+          <div className="h-full w-full bg-[#FC401F]" />
         </div>
       </div>
 

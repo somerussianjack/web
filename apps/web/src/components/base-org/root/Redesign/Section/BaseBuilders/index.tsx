@@ -5,7 +5,7 @@ import PrefixAsset from './prefix.svg';
 import { Terminal } from './Terminal';
 import { VideoPlayer } from 'apps/web/src/components/Brand/Video';
 import ParallaxScaleWrapper from 'apps/web/src/components/base-org/root/Redesign/Section/BaseApp/ParallaxScaleWrapper';
-// import FaultyTerminal from './FaultyTerminal';
+import FaultyTerminal from './FaultyTerminal';
 
 const prefix = PrefixAsset as ImageType;
 
@@ -16,24 +16,24 @@ export function SectionBaseBuilders() {
         <div className="z-[9999]">
           <Terminal />
         </div>
-        <div className="absolute inset-0 w-full h-full">
-          {/* <FaultyTerminal
-            className="w-full h-full"
+        <div className="absolute inset-0 h-full w-full">
+          <FaultyTerminal
+            className="h-full w-full"
             scale={3}
             noiseAmp={1}
             curvature={0.0}
             brightness={1.2}
             scanlineIntensity={0.0}
             tint="#8F8FFF"
-          /> */}
-          <ParallaxScaleWrapper
+          />
+          {/* <ParallaxScaleWrapper
               className="w-full h-full"
               disableParallax
               maxScale={1.1}
               startingScale={1.0}
               scrollRange={{ start: 0.99, end: 0.0 }}>
             <VideoPlayer loop={false} videoSrc="/videos/bg-terminal.mp4" />
-          </ParallaxScaleWrapper>
+          </ParallaxScaleWrapper> */}
         </div>
       </div>
     </Section>
