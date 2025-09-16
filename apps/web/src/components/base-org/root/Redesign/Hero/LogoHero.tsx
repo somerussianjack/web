@@ -24,25 +24,26 @@ export function LogoHero() {
       tag: 'Updated',
     },
     {
-      src: '/videos/september16small.webm',
+      src: '/videos/september16.webm',
       tag: 'Small',
     },
   ];
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: '614.3790893554688 / 200' }}>
-      <video
-        className="h-full w-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-        src={videos[3].src}
-        style={{
-          display: 'block',
-          ...logoMaskStyle,
-        }}
-      />
+    <div className="relative w-full" style={{ aspectRatio: '1076 / 352' }}>
+      <div className="h-full w-full" style={logoMaskStyle}>
+        <video
+          className="h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          src={videos[3].src}
+          style={{
+            display: 'block',
+          }}
+        />
+      </div>
     </div>
   );
 }
