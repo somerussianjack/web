@@ -35,7 +35,7 @@ function BlogCarousel() {
   const displayedPosts: BlogPost[] = blogPosts.slice(0, 2);
 
   return (
-    <div className="overflow-hidden relative col-span-full grid-base !gap-y-[80px]">
+    <div className="grid-base relative col-span-full !gap-y-[80px] overflow-hidden">
       {/* blog card container */}
       {displayedPosts.map((post, index) => (
         <div key={post.href} className="relative col-span-full md:col-span-2">
@@ -96,10 +96,10 @@ function BlogCardContent({
           exit="exit"
           transition={blogCardTransition}
         >
-          <div className="pb-8 w-full sm:pb-12 md:px-0 md:pb-12 xl:px-0">
-            <div className="flex justify-between items-end">
+          <div className="w-full pb-8 sm:pb-12 md:px-0 md:pb-12 xl:px-0">
+            <div className="flex items-end justify-between">
               {/* text */}
-              <div className="flex flex-1 flex-col gap-4 md:max-w-[380px] lg:max-w-[420px] xl:h-36 xl:max-w-[600px]">
+              <motion.div className="flex flex-1 flex-col gap-4 md:max-w-[380px] lg:max-w-[420px] xl:h-36 xl:max-w-[600px]">
                 <motion.h5
                   className={classNames(
                     levelStyles['h2-regular'],
