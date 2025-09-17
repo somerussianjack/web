@@ -144,7 +144,7 @@ export default function RegistrationSearchInput({
     },
 
     // // Animation
-    'transition-all overflow-scroll ',
+    'transition-all overflow-y-auto overflow-x-hidden ',
     {
       'max-h-[20rem]': dropdownOpen,
       'max-h-0 p-0 overflow-hidden border-none': !dropdownOpen,
@@ -160,7 +160,7 @@ export default function RegistrationSearchInput({
   );
 
   const buttonClasses = classNames(
-    'flex w-full flex-row items-center justify-between transition-colors hover:bg-[#F9F9F9] active:bg-[#EAEAEB] text-ellipsis',
+    'flex w-full flex-row items-center justify-between transition-colors hover:bg-[#F9F9F9] active:bg-[#EAEAEB]',
     {
       'px-6 py-3 text': variant === RegistrationSearchInputVariant.Large,
       'px-3 py-2 text-sm': variant === RegistrationSearchInputVariant.Small,
