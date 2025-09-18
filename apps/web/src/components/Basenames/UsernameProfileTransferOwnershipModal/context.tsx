@@ -30,7 +30,6 @@ import useWriteContractsWithLogs, {
   BatchCallsStatus,
 } from 'apps/web/src/hooks/useWriteContractsWithLogs';
 import useBasenameResolver from 'apps/web/src/hooks/useBasenameResolver';
-import L2ReverseRegistrarAbi from 'apps/web/src/abis/L2ReverseRegistrarAbi';
 import { convertChainIdToCoinTypeUint } from 'apps/web/src/utils/usernames';
 
 type ProfileTransferOwnershipProviderProps = {
@@ -45,7 +44,7 @@ export enum OwnershipSteps {
 }
 
 export type OwnershipSettings = {
-  id: 'setAddr' | 'reclaim' | 'setName' | 'safeTransferFrom';
+  id: 'setAddr' | 'reclaim' | 'safeTransferFrom';
   name: string;
   description: string;
   status: WriteTransactionWithReceiptStatus;
@@ -154,16 +153,6 @@ export default function ProfileTransferOwnershipProvider({
     } as ContractFunctionParameters;
   }, [address, basenameChain.id, isValidRecipientAddress, recipientAddress, tokenId]);
 
-  // Step 4, set the reverse resolution record
-  const setNameContract = useMemo(() => {
-    return {
-      abi: L2ReverseRegistrarAbi,
-      address: USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES[basenameChain.id],
-      args: [''],
-      functionName: 'setName',
-    } as ContractFunctionParameters;
-  }, [basenameChain.id]);
-
   // Bundled transaction - Experimental
   const {
     initiateBatchCalls,
@@ -176,7 +165,7 @@ export default function ProfileTransferOwnershipProvider({
     eventName: 'basename_send_calls_transfer_ownership',
   });
 
-  // The 4 transactions we got to track
+  // The 3 transactions we got to track
   const {
     initiateTransaction: initiateSafeTransferFrom,
     transactionStatus: safeTransferFromStatus,
@@ -198,21 +187,15 @@ export default function ProfileTransferOwnershipProvider({
       eventName: 'basename_set_addr',
     });
 
-  const { initiateTransaction: initiateSetName, transactionStatus: setNameStatus } =
-    useWriteContractWithReceipt({
-      chain: basenameChain,
-      eventName: 'basename_set_name',
-    });
-
   // One batched transaction
   const updateViaBatchCalls = useCallback(async () => {
     if (!isValidRecipientAddress) return;
     if (!address) return;
     if (!basenameChain) return;
     if (!batchCallsEnabled) return;
-    if (setAddrContract && reclaimContract && safeTransferFromContract && setNameContract) {
+    if (setAddrContract && reclaimContract && safeTransferFromContract) {
       await initiateBatchCalls({
-        contracts: [setAddrContract, reclaimContract, safeTransferFromContract, setNameContract],
+        contracts: [setAddrContract, reclaimContract, safeTransferFromContract],
         account: address,
         chain: basenameChain,
       });
@@ -226,7 +209,6 @@ export default function ProfileTransferOwnershipProvider({
     reclaimContract,
     safeTransferFromContract,
     setAddrContract,
-    setNameContract,
   ]);
 
   // The 4 Function with safety checks
@@ -245,11 +227,6 @@ export default function ProfileTransferOwnershipProvider({
     await initiateSafeTransferFrom(safeTransferFromContract);
   }, [initiateSafeTransferFrom, safeTransferFromContract]);
 
-  const updateSetName = useCallback(async () => {
-    if (!setNameContract) return Promise.reject('Invalid setNameContract');
-    await initiateSetName(setNameContract);
-  }, [initiateSetName, setNameContract]);
-
   // Function & status we can track and display the edit rec
   const ownershipSettings: OwnershipSettings[] = useMemo(() => {
     const settings: OwnershipSettings[] = [];
@@ -261,13 +238,6 @@ export default function ProfileTransferOwnershipProvider({
         description: 'Your Basename will resolve to this address.',
         status: setAddrStatus,
         contractFunction: updateSetAddr,
-      });
-      settings.push({
-        id: 'setName',
-        name: 'Name record',
-        description: 'Your Basename will no longer be displayed with your address.',
-        status: setNameStatus,
-        contractFunction: updateSetName,
       });
     }
 
@@ -298,8 +268,6 @@ export default function ProfileTransferOwnershipProvider({
     canSafeTransferFrom,
     setAddrStatus,
     updateSetAddr,
-    setNameStatus,
-    updateSetName,
     reclaimStatus,
     updateReclaim,
     safeTransferFromStatus,

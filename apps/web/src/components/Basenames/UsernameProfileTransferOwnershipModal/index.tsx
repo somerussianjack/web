@@ -167,7 +167,9 @@ export default function UsernameProfileTransferOwnershipModal({
           {batchTransactionsEnabled ? (
             <p>Confirm the transaction in your wallet to send this name.</p>
           ) : (
-            <p>You will need to confirm all four transactions in your wallet to send this name. </p>
+            <p>
+              You will need to confirm all three transactions in your wallet to send this name.{' '}
+            </p>
           )}
           <ul className="flex w-full flex-col gap-4">
             {ownershipSettings.map((ownershipSetting) => (
