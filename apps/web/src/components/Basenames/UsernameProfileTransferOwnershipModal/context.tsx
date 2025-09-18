@@ -19,19 +19,28 @@ import {
   useState,
 } from 'react';
 import { ContractFunctionParameters, Hash, isAddress, namehash, encodeFunctionData } from 'viem';
-import { useAccount } from 'wagmi';
+import { useAccount, useSignMessage } from 'wagmi';
 import L2ResolverAbi from 'apps/web/src/abis/L2Resolver';
 import BaseRegistrarAbi from 'apps/web/src/abis/BaseRegistrarAbi';
+import ReverseRegistrarAbi from 'apps/web/src/abis/ReverseRegistrarAbi';
+import UpgradeableRegistrarControllerAbi from 'apps/web/src/abis/UpgradeableRegistrarControllerAbi';
 import {
   USERNAME_BASE_REGISTRAR_ADDRESSES,
   USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES,
+  USERNAME_REVERSE_REGISTRAR_ADDRESSES,
+  USERNAME_L2_RESOLVER_ADDRESSES,
+  UPGRADEABLE_REGISTRAR_CONTROLLER_ADDRESSES,
 } from 'apps/web/src/addresses/usernames';
 import useWriteContractsWithLogs, {
   BatchCallsStatus,
 } from 'apps/web/src/hooks/useWriteContractsWithLogs';
 import useBasenameResolver from 'apps/web/src/hooks/useBasenameResolver';
+import useCapabilitiesSafe from 'apps/web/src/hooks/useCapabilitiesSafe';
 import L2ReverseRegistrarAbi from 'apps/web/src/abis/L2ReverseRegistrarAbi';
-import { convertChainIdToCoinTypeUint } from 'apps/web/src/utils/usernames';
+import {
+  convertChainIdToCoinTypeUint,
+  signReverseRecordMessage,
+} from 'apps/web/src/utils/usernames';
 
 type ProfileTransferOwnershipProviderProps = {
   children?: ReactNode;
@@ -40,6 +49,7 @@ type ProfileTransferOwnershipProviderProps = {
 export enum OwnershipSteps {
   Search = 'search',
   OwnershipOverview = 'ownership-overview',
+  SignatureCollection = 'signature-collection',
   WalletRequests = 'wallet-requests',
   Success = 'success',
 }
@@ -63,6 +73,10 @@ export type ProfileTransferOwnershipContextProps = {
   batchCallsStatus: BatchCallsStatus;
   batchCallsIsLoading: boolean;
   ownershipTransactionHash?: Hash;
+  isEOA: boolean;
+  signatureError: Error | null;
+  collectSignature: () => Promise<void>;
+  signatureCollected: boolean;
 };
 
 export const ProfileTransferOwnershipContext = createContext<ProfileTransferOwnershipContextProps>({
@@ -76,6 +90,10 @@ export const ProfileTransferOwnershipContext = createContext<ProfileTransferOwne
   batchCallsStatus: BatchCallsStatus.Idle,
   batchCallsIsLoading: false,
   ownershipTransactionHash: undefined,
+  isEOA: false,
+  signatureError: null,
+  collectSignature: async () => undefined,
+  signatureCollected: false,
 });
 
 export default function ProfileTransferOwnershipProvider({
@@ -86,6 +104,10 @@ export default function ProfileTransferOwnershipProvider({
   const { profileUsername, canReclaim, canSafeTransferFrom, canSetAddr } = useUsernameProfile();
   const { basenameChain } = useBasenameChain(profileUsername);
   const { logError } = useErrors();
+  const { signMessageAsync } = useSignMessage();
+  const { paymasterService: paymasterServiceEnabled } = useCapabilitiesSafe({
+    chainId: basenameChain.id,
+  });
 
   // Fetch resolver address from registry for the basename
   const { data: resolverAddress } = useBasenameResolver({
@@ -97,10 +119,43 @@ export default function ProfileTransferOwnershipProvider({
   const [currentOwnershipStep, setCurrentOwnershipStep] = useState<OwnershipSteps>(
     OwnershipSteps.Search,
   );
+  const [signatureError, setSignatureError] = useState<Error | null>(null);
+  const [signatureData, setSignatureData] = useState<{
+    coinTypes: readonly bigint[];
+    signatureExpiry: bigint;
+    signature: `0x${string}`;
+  } | null>(null);
 
   // TODO: Validate that it's not a contract recipient
   const isValidRecipientAddress = isAddress(recipientAddress);
   const tokenId = getTokenIdFromBasename(profileUsername);
+
+  // Determine wallet type - EOA if paymaster service is not enabled
+  const isEOA = !paymasterServiceEnabled;
+  const signatureCollected = !!signatureData;
+
+  // Signature collection for EOAs
+  const collectSignature = useCallback(async () => {
+    if (!address || !isEOA) return;
+
+    try {
+      setSignatureError(null);
+
+      const nameLabel = ''; // Empty string for removing reverse record
+      const signatureData = await signReverseRecordMessage({
+        address,
+        chainId: basenameChain.id,
+        nameLabel,
+        signMessageAsync,
+      });
+
+      setSignatureData(signatureData);
+    } catch (error) {
+      logError(error, 'Signature collection failed');
+      const msg = error instanceof Error && error.message ? error.message : 'Unknown error';
+      setSignatureError(new Error(`Could not prepare reverse record signature: ${msg}`));
+    }
+  }, [address, isEOA, basenameChain.id, signMessageAsync, logError]);
 
   // Contract write calls
   // Step 1, set the address records (legacy and ENSIP-11)
@@ -154,15 +209,34 @@ export default function ProfileTransferOwnershipProvider({
     } as ContractFunctionParameters;
   }, [address, basenameChain.id, isValidRecipientAddress, recipientAddress, tokenId]);
 
-  // Step 4, set the reverse resolution record
+  // Step 4, set the reverse resolution record - context-aware for EOA vs SCW
   const setNameContract = useMemo(() => {
-    return {
-      abi: L2ReverseRegistrarAbi,
-      address: USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES[basenameChain.id],
-      args: [''],
-      functionName: 'setName',
-    } as ContractFunctionParameters;
-  }, [basenameChain.id]);
+    if (isEOA) {
+      // EOA flow: Use UpgradeableRegistrarController with signature
+      if (!signatureData) return undefined;
+
+      const nameLabel = ''; // Empty string for removing reverse record
+      return {
+        abi: UpgradeableRegistrarControllerAbi,
+        address: UPGRADEABLE_REGISTRAR_CONTROLLER_ADDRESSES[basenameChain.id],
+        args: [
+          nameLabel,
+          signatureData.signatureExpiry,
+          signatureData.coinTypes,
+          signatureData.signature,
+        ],
+        functionName: 'setReverseRecord',
+      } as ContractFunctionParameters;
+    } else {
+      // SCW flow: Use L2ReverseRegistrar
+      return {
+        abi: L2ReverseRegistrarAbi,
+        address: USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES[basenameChain.id],
+        args: [''],
+        functionName: 'setName',
+      } as ContractFunctionParameters;
+    }
+  }, [basenameChain.id, isEOA, signatureData]);
 
   // Bundled transaction - Experimental
   const {
@@ -210,9 +284,39 @@ export default function ProfileTransferOwnershipProvider({
     if (!address) return;
     if (!basenameChain) return;
     if (!batchCallsEnabled) return;
-    if (setAddrContract && reclaimContract && safeTransferFromContract && setNameContract) {
+
+    const contracts = [];
+
+    // Add setAddr and reclaim/safeTransferFrom contracts if available
+    if (setAddrContract) contracts.push(setAddrContract);
+    if (reclaimContract) contracts.push(reclaimContract);
+    if (safeTransferFromContract) contracts.push(safeTransferFromContract);
+
+    // For SCWs, add both reverse record contracts
+    if (!isEOA) {
+      // Add setNameForAddr contract (similar to useSetPrimaryBasename)
+      contracts.push({
+        abi: ReverseRegistrarAbi,
+        address: USERNAME_REVERSE_REGISTRAR_ADDRESSES[basenameChain.id],
+        args: [
+          address,
+          address,
+          USERNAME_L2_RESOLVER_ADDRESSES[basenameChain.id],
+          '', // Empty string for removing reverse record
+        ],
+        functionName: 'setNameForAddr',
+      });
+
+      // Add setName contract
+      if (setNameContract) contracts.push(setNameContract);
+    } else {
+      // For EOAs, just add the single setReverseRecord contract
+      if (setNameContract) contracts.push(setNameContract);
+    }
+
+    if (contracts.length > 0) {
       await initiateBatchCalls({
-        contracts: [setAddrContract, reclaimContract, safeTransferFromContract, setNameContract],
+        contracts,
         account: address,
         chain: basenameChain,
       });
@@ -227,6 +331,7 @@ export default function ProfileTransferOwnershipProvider({
     safeTransferFromContract,
     setAddrContract,
     setNameContract,
+    isEOA,
   ]);
 
   // The 4 Function with safety checks
@@ -315,9 +420,29 @@ export default function ProfileTransferOwnershipProvider({
     });
   }, [ownershipSettings]);
 
+  // Handle signature collection step for EOAs
+  useEffect(() => {
+    if (currentOwnershipStep !== OwnershipSteps.SignatureCollection) return;
+    if (!isEOA) {
+      // Skip signature collection for SCWs
+      setCurrentOwnershipStep(OwnershipSteps.WalletRequests);
+      return;
+    }
+    if (signatureCollected) {
+      // Signature already collected, move to wallet requests
+      setCurrentOwnershipStep(OwnershipSteps.WalletRequests);
+    }
+  }, [currentOwnershipStep, isEOA, signatureCollected]);
+
   useEffect(() => {
     // Only when the wallet request steps is displaying
     if (currentOwnershipStep !== OwnershipSteps.WalletRequests) return;
+
+    // For EOAs, ensure signature is collected before proceeding
+    if (isEOA && !signatureCollected) {
+      setCurrentOwnershipStep(OwnershipSteps.SignatureCollection);
+      return;
+    }
 
     // Some transactions are loading / failed: return early
     if (!ownershipSettingsAreWaiting) return;
@@ -361,6 +486,8 @@ export default function ProfileTransferOwnershipProvider({
     ownershipSettings,
     ownershipSettingsAreWaiting,
     updateViaBatchCalls,
+    isEOA,
+    signatureCollected,
   ]);
 
   const isSuccess = useMemo(
@@ -405,6 +532,10 @@ export default function ProfileTransferOwnershipProvider({
       recipientAddress,
       setRecipientAddress,
       ownershipTransactionHash,
+      isEOA,
+      signatureError,
+      collectSignature,
+      signatureCollected,
     };
   }, [
     ownershipSettings,
@@ -415,6 +546,10 @@ export default function ProfileTransferOwnershipProvider({
     currentOwnershipStep,
     recipientAddress,
     ownershipTransactionHash,
+    isEOA,
+    signatureError,
+    collectSignature,
+    signatureCollected,
   ]);
 
   return (

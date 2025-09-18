@@ -14,6 +14,7 @@ import {
 } from 'viem';
 import { normalize } from 'viem/ens';
 import L2ResolverAbi from 'apps/web/src/abis/L2Resolver';
+import L2ReverseRegistrarAbi from 'apps/web/src/abis/L2ReverseRegistrarAbi';
 import RegistryAbi from 'apps/web/src/abis/RegistryAbi';
 import BaseRegistrarAbi from 'apps/web/src/abis/BaseRegistrarAbi';
 import { base, baseSepolia, mainnet } from 'viem/chains';
@@ -22,6 +23,7 @@ import {
   UPGRADEABLE_REGISTRAR_CONTROLLER_ADDRESSES,
   USERNAME_BASE_REGISTRAR_ADDRESSES,
   USERNAME_BASE_REGISTRY_ADDRESSES,
+  USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES,
 } from 'apps/web/src/addresses/usernames';
 
 import {
@@ -824,4 +826,42 @@ export async function isBasenameInGracePeriod(username: Basename): Promise<boole
     });
     return false;
   }
+}
+
+/**
+ * Sign a message for reverse record operations using setNameForAddrWithSignature
+ */
+export async function signReverseRecordMessage({
+  address,
+  chainId,
+  nameLabel,
+  signMessageAsync,
+}: {
+  address: Address;
+  chainId: number;
+  nameLabel: string;
+  signMessageAsync: (args: any) => Promise<`0x${string}`>;
+}): Promise<{
+  coinTypes: readonly bigint[];
+  signatureExpiry: bigint;
+  signature: `0x${string}`;
+}> {
+  const reverseRegistrar = USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES[chainId];
+  const functionAbi = L2ReverseRegistrarAbi.find(
+    (f) => f.type === 'function' && f.name === 'setNameForAddrWithSignature',
+  ) as unknown as AbiFunction;
+
+  const signatureExpiry = BigInt(Math.floor(Date.now() / 1000) + 5 * 60);
+  const { digest, coinTypes } = buildReverseRegistrarSignatureDigest({
+    reverseRegistrar,
+    functionAbi,
+    address,
+    chainId,
+    name: nameLabel,
+    signatureExpiry,
+  });
+
+  const signature = await signMessageAsync({ message: { raw: digest } });
+
+  return { coinTypes, signatureExpiry, signature };
 }

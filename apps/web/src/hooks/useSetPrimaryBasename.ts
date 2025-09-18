@@ -3,6 +3,7 @@ import {
   USERNAME_L2_RESOLVER_ADDRESSES,
   USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES,
   USERNAME_REVERSE_REGISTRAR_ADDRESSES,
+  UPGRADEABLE_REGISTRAR_CONTROLLER_ADDRESSES,
 } from 'apps/web/src/addresses/usernames';
 import useBasenameChain from 'apps/web/src/hooks/useBasenameChain';
 import { useCallback, useEffect, useState } from 'react';
@@ -16,9 +17,7 @@ import useWriteContractsWithLogs from 'apps/web/src/hooks/useWriteContractsWithL
 import useCapabilitiesSafe from 'apps/web/src/hooks/useCapabilitiesSafe';
 import L2ReverseRegistrarAbi from 'apps/web/src/abis/L2ReverseRegistrarAbi';
 import UpgradeableRegistrarControllerAbi from 'apps/web/src/abis/UpgradeableRegistrarControllerAbi';
-import { UPGRADEABLE_REGISTRAR_CONTROLLER_ADDRESSES } from 'apps/web/src/addresses/usernames';
-import { type AbiFunction } from 'viem';
-import { buildReverseRegistrarSignatureDigest } from 'apps/web/src/utils/usernames';
+import { signReverseRecordMessage } from 'apps/web/src/utils/usernames';
 
 /*
   A hook to set a name as primary for resolution.
@@ -75,23 +74,13 @@ export default function useSetPrimaryBasename({ secondaryUsername }: UseSetPrima
   const signMessageForReverseRecord = useCallback(async () => {
     if (!address) throw new Error('No address');
 
-    const reverseRegistrar = USERNAME_L2_REVERSE_REGISTRAR_ADDRESSES[secondaryUsernameChain.id];
-    const functionAbi = L2ReverseRegistrarAbi.find(
-      (f) => f.type === 'function' && f.name === 'setNameForAddrWithSignature',
-    ) as unknown as AbiFunction;
-
-    const signatureExpiry = BigInt(Math.floor(Date.now() / 1000) + 5 * 60);
     const nameLabel = (secondaryUsername as string).split('.')[0];
-    const { digest, coinTypes } = buildReverseRegistrarSignatureDigest({
-      reverseRegistrar,
-      functionAbi,
+    return await signReverseRecordMessage({
       address,
       chainId: secondaryUsernameChain.id,
-      name: nameLabel,
-      signatureExpiry,
+      nameLabel,
+      signMessageAsync,
     });
-    const signature = await signMessageAsync({ message: { raw: digest } });
-    return { coinTypes, signatureExpiry, signature } as const;
   }, [address, secondaryUsername, secondaryUsernameChain.id, signMessageAsync]);
 
   useEffect(() => {
