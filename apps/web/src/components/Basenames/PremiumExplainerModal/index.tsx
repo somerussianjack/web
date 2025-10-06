@@ -12,7 +12,7 @@ type CustomTooltipProps = {
     {
       dataKey: 'premium';
       name: 'premium';
-      payload: { hours: number; premium: number };
+      payload: { days: number; premium: number };
       value: number;
     },
   ];
@@ -26,8 +26,8 @@ function CustomTooltip({
 }: CustomTooltipProps) {
   if (active && payload?.length && auctionStartTimeSeconds && baseSingleYearEthCost) {
     const premium = payload[0].value;
-    const hours = payload[0].payload.hours;
-    const seconds = hours * 60 * 60;
+    const days = payload[0].payload.days;
+    const seconds = days * 24 * 60 * 60; // Convert days to seconds
     const tooltipSeconds = seconds + Number(auctionStartTimeSeconds);
     const timeOfPremium = new Date(tooltipSeconds * 1000).toLocaleString(undefined, {
       year: 'numeric',
@@ -96,8 +96,8 @@ export function PremiumExplainerModal({
       <div className="flex max-w-[491px] flex-1 flex-col gap-3">
         <h1 className="w-full text-2xl font-bold">This name has a temporary premium</h1>
         <p className="mb-3 text-illoblack">
-          To ensure fair distribution of Basenames, all names have a temporary premium starting at
-          100 ETH that then decays exponentially to 0 over 36 hours.
+          To ensure fair distribution of recently expired Basenames, all names have a price premium
+          which starts at 100 ETH that then decays exponentially to 0 over 21 days.
         </p>
         <div className="grid  grid-cols-2 grid-rows-4">
           <div className="col-span-2 mb-2 text-sm font-medium uppercase text-gray-60">
