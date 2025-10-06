@@ -1,4 +1,4 @@
-import { useBasenamesNameExpires } from 'apps/web/src/hooks/useBasenamesLaunchTime';
+import { useBasenamesNameExpires } from 'apps/web/src/hooks/useBasenamesNameExpires';
 import { useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 

@@ -1,6 +1,6 @@
 import Modal from 'apps/web/src/components/Modal';
 import data from 'apps/web/src/data/usernamePriceDecayTable.json';
-import { useBasenamesNameExpires } from 'apps/web/src/hooks/useBasenamesLaunchTime';
+import { useBasenamesNameExpires } from 'apps/web/src/hooks/useBasenamesNameExpires';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { formatEther } from 'viem';
 
