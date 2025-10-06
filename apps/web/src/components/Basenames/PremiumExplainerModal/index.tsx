@@ -1,13 +1,13 @@
 import Modal from 'apps/web/src/components/Modal';
 import data from 'apps/web/src/data/usernamePriceDecayTable.json';
-import { useBasenamesLaunchTime } from 'apps/web/src/hooks/useBasenamesLaunchTime';
+import { useBasenamesNameExpires } from 'apps/web/src/hooks/useBasenamesLaunchTime';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { formatEther } from 'viem';
 
 type CustomTooltipProps = {
   active?: boolean;
   baseSingleYearEthCost?: bigint;
-  launchTimeSeconds?: bigint;
+  auctionStartTimeSeconds?: bigint;
   payload: [
     {
       dataKey: 'premium';
@@ -22,13 +22,13 @@ function CustomTooltip({
   active,
   payload,
   baseSingleYearEthCost,
-  launchTimeSeconds,
+  auctionStartTimeSeconds,
 }: CustomTooltipProps) {
-  if (active && payload?.length && launchTimeSeconds && baseSingleYearEthCost) {
+  if (active && payload?.length && auctionStartTimeSeconds && baseSingleYearEthCost) {
     const premium = payload[0].value;
     const hours = payload[0].payload.hours;
     const seconds = hours * 60 * 60;
-    const tooltipSeconds = seconds + Number(launchTimeSeconds);
+    const tooltipSeconds = seconds + Number(auctionStartTimeSeconds);
     const timeOfPremium = new Date(tooltipSeconds * 1000).toLocaleString(undefined, {
       year: 'numeric',
       month: '2-digit',
@@ -65,6 +65,7 @@ type PremiumExplainerModalProps = {
   toggleModal: () => void;
   premiumEthAmount: bigint | undefined;
   baseSingleYearEthCost: bigint;
+  name: string;
 };
 const chartMarginValues = { top: 2, right: 2, left: 2, bottom: 2 };
 export function PremiumExplainerModal({
@@ -72,8 +73,9 @@ export function PremiumExplainerModal({
   toggleModal,
   premiumEthAmount,
   baseSingleYearEthCost,
+  name,
 }: PremiumExplainerModalProps) {
-  const { data: launchTimeSeconds } = useBasenamesLaunchTime();
+  const { data: auctionStartTimeSeconds } = useBasenamesNameExpires(name);
 
   if (!premiumEthAmount || !baseSingleYearEthCost) return null;
   const formattedOneYearCost = Number(formatEther(baseSingleYearEthCost)).toLocaleString(
@@ -147,7 +149,7 @@ export function PremiumExplainerModal({
                   // @ts-expect-error type wants an unnecessary prop
                   <CustomTooltip
                     baseSingleYearEthCost={baseSingleYearEthCost}
-                    launchTimeSeconds={launchTimeSeconds}
+                    auctionStartTimeSeconds={auctionStartTimeSeconds}
                   />
                 }
               />
