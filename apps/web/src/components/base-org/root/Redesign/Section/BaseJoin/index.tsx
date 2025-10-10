@@ -53,13 +53,13 @@ const cards: CardProps[] = [
   },
   {
     index: 2,
-    title: 'Onchain Summer',
+    title: 'BaseCamp 2025',
     description:
-      'Ship what you love and be rewarded, all season long. Each week, we’re spotlighting the best apps. What are you building?',
+      'Watch the State of Base from BaseCamp 2025, our annual gathering of builders, creators, and people bringing the world onchain.',
     image: card2.src,
     brightness: 1.2,
     contrast: 0.9,
-    href: 'https://onchainsummer.xyz/',
+    href: 'https://www.basecamp2025.xyz/',
   },
   {
     index: 3,
