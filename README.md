@@ -121,7 +121,7 @@ By opening a PR to add your project, you authorize and license Coinbase on a non
 
 **Note:** Submissions do not guarantee inclusion and all submissions are subject to review. Your project must be live on Base to potentially be included. Ensure all information is accurate and up-to-date.
 
-#### Submission requirements
+### Submission requirements
 
 - App content adheres to the [Base Editorial Style Guide](https://github.com/base/brand-kit/blob/main/guides/editorial-style-guide.md)
 - App has been live on Base for at least 30 days
